@@ -1,11 +1,11 @@
 /* ==========================================================================
-   AlgoMaster Lab - Visualizer Simulation Step Generators
+   Kento Lab - Visualizer Simulation Step Generators
    ========================================================================== */
 
 // 1. Hardcoded Algorithm Execution Generators
 const algorithmExecutions = {
   "linear": {
-    generator: function(arr, target) {
+    generator: function (arr, target) {
       let steps = [];
       steps.push({ array: [...arr], highlights: {}, line: 1, desc: `Khởi động tìm kiếm tuần tự cho Target = ${target}` });
       let found = false;
@@ -23,18 +23,18 @@ const algorithmExecutions = {
       }
       if (!found) {
         let hl = {};
-        for (let k = 0; k < arr.length; k++) hl[k] = 'skipped';
+        for (let k = 0; k < arr.length; k++) hl[k] = 'compare';
         steps.push({ array: [...arr], highlights: hl, line: 4, desc: "Đã duyệt qua toàn bộ mảng nhưng không tìm thấy Target." });
       }
       return steps;
     }
   },
   "binary": {
-    generator: function(arr, target) {
+    generator: function (arr, target) {
       let sortedArr = [...arr].sort((a, b) => a - b);
       let steps = [];
       steps.push({ array: [...sortedArr], highlights: {}, low: 0, high: sortedArr.length - 1, line: 1, desc: `Sắp xếp mảng để chạy Binary Search cho Target = ${target}` });
-      
+
       let low = 0, high = sortedArr.length - 1;
       let found = false;
 
@@ -78,24 +78,24 @@ const algorithmExecutions = {
     }
   },
   "bubble": {
-    generator: function(arr) {
+    generator: function (arr) {
       let steps = [];
       let temp = [...arr];
       let n = temp.length;
       steps.push({ array: [...temp], highlights: {}, line: 1, desc: "Khởi tạo mảng ban đầu, bắt đầu Bubble Sort." });
       for (let i = 0; i < n - 1; i++) {
         for (let j = 0; j < n - i - 1; j++) {
-          steps.push({ array: [...temp], highlights: { [j]: 'compare', [j+1]: 'compare' }, line: 3, desc: `So sánh cặp phần tử kề nhau arr[${j}] (${temp[j]}) và arr[${j+1}] (${temp[j+1]})` });
-          if (temp[j] > temp[j+1]) {
+          steps.push({ array: [...temp], highlights: { [j]: 'compare', [j + 1]: 'compare' }, line: 3, desc: `So sánh cặp phần tử kề nhau arr[${j}] (${temp[j]}) và arr[${j + 1}] (${temp[j + 1]})` });
+          if (temp[j] > temp[j + 1]) {
             let s = temp[j];
-            temp[j] = temp[j+1];
-            temp[j+1] = s;
-            steps.push({ array: [...temp], highlights: { [j]: 'swap', [j+1]: 'swap' }, line: 4, desc: `Vì ${temp[j+1]} < ${temp[j]}, tiến hành hoán đổi hai số này.` });
+            temp[j] = temp[j + 1];
+            temp[j + 1] = s;
+            steps.push({ array: [...temp], highlights: { [j]: 'swap', [j + 1]: 'swap' }, line: 4, desc: `Vì ${temp[j + 1]} < ${temp[j]}, tiến hành hoán đổi hai số này.` });
           }
         }
         let sorted = {};
         for (let k = n - i - 1; k < n; k++) sorted[k] = 'sorted';
-        steps.push({ array: [...temp], highlights: sorted, line: 1, desc: `Phần tử lớn nhất trong phân đoạn quét (${temp[n-i-1]}) đã cố định chính xác.` });
+        steps.push({ array: [...temp], highlights: sorted, line: 1, desc: `Phần tử lớn nhất trong phân đoạn quét (${temp[n - i - 1]}) đã cố định chính xác.` });
       }
       let sortedAll = {};
       for (let k = 0; k < n; k++) sortedAll[k] = 'sorted';
@@ -104,7 +104,7 @@ const algorithmExecutions = {
     }
   },
   "selection": {
-    generator: function(arr) {
+    generator: function (arr) {
       let steps = [];
       let temp = [...arr];
       let n = temp.length;
@@ -127,7 +127,7 @@ const algorithmExecutions = {
         }
         let sorted = {};
         for (let k = 0; k <= i; k++) sorted[k] = 'sorted';
-        steps.push({ array: [...temp], highlights: sorted, line: 1, desc: `Phần tử nhỏ nhất thứ ${i+1} đã được cố định chính xác tại index ${i}.` });
+        steps.push({ array: [...temp], highlights: sorted, line: 1, desc: `Phần tử nhỏ nhất thứ ${i + 1} đã được cố định chính xác tại index ${i}.` });
       }
       let sortedAll = {};
       for (let k = 0; k < n; k++) sortedAll[k] = 'sorted';
@@ -136,20 +136,20 @@ const algorithmExecutions = {
     }
   },
   "sieve_primes": {
-    generator: function() {
+    generator: function () {
       let steps = [];
       let n = 50;
       let is_prime = Array(n + 1).fill(true);
       is_prime[0] = is_prime[1] = false;
       steps.push({ consoleOut: "Bắt đầu khởi tạo sàng nguyên tố phạm vi N = 50.\nGiả sử ban đầu tất cả các số [2..50] đều là số nguyên tố.", line: 1 });
-      
+
       for (let p = 2; p * p <= n; p++) {
         if (is_prime[p]) {
-          steps.push({ consoleOut: `Số p = ${p} chưa bị đánh dấu -> Là SỐ NGUYÊN TỐ.\nTiến hành duyệt các bội số của ${p} bắt đầu từ ${p*p}...`, line: 3 });
+          steps.push({ consoleOut: `Số p = ${p} chưa bị đánh dấu -> Là SỐ NGUYÊN TỐ.\nTiến hành duyệt các bội số của ${p} bắt đầu từ ${p * p}...`, line: 3 });
           for (let i = p * p; i <= n; i += p) {
             if (is_prime[i]) {
               is_prime[i] = false;
-              steps.push({ consoleOut: `  Đánh dấu bội số: ${i} = ${p} * ${i/p} là HỢP SỐ (loại bỏ khỏi sàng).`, line: 5 });
+              steps.push({ consoleOut: `  Đánh dấu bội số: ${i} = ${p} * ${i / p} là HỢP SỐ (loại bỏ khỏi sàng).`, line: 5 });
             }
           }
         }
@@ -168,7 +168,7 @@ const algorithmExecutions = {
 const dynamicGenerators = {
   // --- SORTING FAMILY ---
   sorting: {
-    insertion: function(arr) {
+    insertion: function (arr) {
       let steps = [];
       let temp = [...arr];
       let n = temp.length;
@@ -178,25 +178,25 @@ const dynamicGenerators = {
         let j = i - 1;
         steps.push({ array: [...temp], highlights: { [i]: 'pivot' }, line: 2, desc: `Xét phần tử khóa Key = arr[${i}] = ${key}` });
         while (j >= 0 && temp[j] > key) {
-          steps.push({ array: [...temp], highlights: { [j]: 'compare', [j+1]: 'swap' }, line: 3, desc: `So sánh arr[${j}] (${temp[j]}) > Key (${key}). Di chuyển sang phải.` });
+          steps.push({ array: [...temp], highlights: { [j]: 'compare', [j + 1]: 'swap' }, line: 3, desc: `So sánh arr[${j}] (${temp[j]}) > Key (${key}). Di chuyển sang phải.` });
           temp[j + 1] = temp[j];
           j = j - 1;
         }
         temp[j + 1] = key;
         let hl = {};
         for (let k = 0; k <= i; k++) hl[k] = 'sorted';
-        steps.push({ array: [...temp], highlights: hl, line: 4, desc: `Chèn Key (${key}) vào vị trí arr[${j+1}]. Phân đoạn [0..${i}] đã tạm sắp xếp.` });
+        steps.push({ array: [...temp], highlights: hl, line: 4, desc: `Chèn Key (${key}) vào vị trí arr[${j + 1}]. Phân đoạn [0..${i}] đã tạm sắp xếp.` });
       }
       let hlAll = {};
       for (let k = 0; k < n; k++) hlAll[k] = 'sorted';
       steps.push({ array: [...temp], highlights: hlAll, line: 1, desc: "Mảng đã hoàn thành Sắp xếp chèn!" });
       return steps;
     },
-    merge_sort: function(arr) {
+    merge_sort: function (arr) {
       let steps = [];
       let temp = [...arr];
       steps.push({ array: [...temp], highlights: {}, line: 1, desc: "Khởi động Sắp xếp trộn (Merge Sort)." });
-      
+
       function mergeSortHelper(l, r) {
         if (l >= r) return;
         let mid = Math.floor((l + r) / 2);
@@ -204,16 +204,16 @@ const dynamicGenerators = {
         mergeSortHelper(mid + 1, r);
         merge(l, mid, r);
       }
-      
+
       function merge(l, mid, r) {
         let leftArr = temp.slice(l, mid + 1);
         let rightArr = temp.slice(mid + 1, r + 1);
         let i = 0, j = 0, k = l;
-        
-        steps.push({ array: [...temp], highlights: { [l]: 'pivot', [r]: 'pivot' }, line: 2, desc: `Gộp hai phân đoạn đã sắp xếp: [${l}..${mid}] và [${mid+1}..${r}]` });
-        
+
+        steps.push({ array: [...temp], highlights: { [l]: 'pivot', [r]: 'pivot' }, line: 2, desc: `Gộp hai phân đoạn đã sắp xếp: [${l}..${mid}] và [${mid + 1}..${r}]` });
+
         while (i < leftArr.length && j < rightArr.length) {
-          steps.push({ array: [...temp], highlights: { [l+i]: 'compare', [mid+1+j]: 'compare' }, line: 3, desc: `So sánh các phần tử đầu phân đoạn: ${leftArr[i]} và ${rightArr[j]}` });
+          steps.push({ array: [...temp], highlights: { [l + i]: 'compare', [mid + 1 + j]: 'compare' }, line: 3, desc: `So sánh các phần tử đầu phân đoạn: ${leftArr[i]} và ${rightArr[j]}` });
           if (leftArr[i] <= rightArr[j]) {
             temp[k] = leftArr[i];
             i++;
@@ -224,37 +224,37 @@ const dynamicGenerators = {
           steps.push({ array: [...temp], highlights: { [k]: 'swap' }, line: 4, desc: `Ghi nhận phần tử nhỏ hơn vào vị trí ${k}: arr[${k}] = ${temp[k]}` });
           k++;
         }
-        
+
         while (i < leftArr.length) {
           temp[k] = leftArr[i];
           steps.push({ array: [...temp], highlights: { [k]: 'swap' }, line: 4, desc: `Sao chép phần tử dư bên trái: arr[${k}] = ${temp[k]}` });
           i++;
           k++;
         }
-        
+
         while (j < rightArr.length) {
           temp[k] = rightArr[j];
           steps.push({ array: [...temp], highlights: { [k]: 'swap' }, line: 4, desc: `Sao chép phần tử dư bên phải: arr[${k}] = ${temp[k]}` });
           j++;
           k++;
         }
-        
+
         let hl = {};
         for (let m = l; m <= r; m++) hl[m] = 'sorted';
         steps.push({ array: [...temp], highlights: hl, line: 1, desc: `Gộp thành công phân đoạn [${l}..${r}]` });
       }
-      
+
       mergeSortHelper(0, temp.length - 1);
       let hlAll = {};
       for (let m = 0; m < temp.length; m++) hlAll[m] = 'sorted';
       steps.push({ array: [...temp], highlights: hlAll, line: 1, desc: "Mảng đã hoàn thành Sắp xếp trộn!" });
       return steps;
     },
-    quick_sort: function(arr) {
+    quick_sort: function (arr) {
       let steps = [];
       let temp = [...arr];
       steps.push({ array: [...temp], highlights: {}, line: 1, desc: "Khởi động Sắp xếp nhanh (Quick Sort)." });
-      
+
       function quick(l, r) {
         if (l >= r) {
           if (l >= 0 && l < temp.length) {
@@ -278,20 +278,20 @@ const dynamicGenerators = {
         let s = temp[i + 1];
         temp[i + 1] = temp[r];
         temp[r] = s;
-        steps.push({ array: [...temp], highlights: { [i + 1]: 'sorted' }, line: 5, desc: `Đưa pivot về vị trí phân hoạch chính xác: arr[${i+1}] = ${pivotVal}` });
-        
+        steps.push({ array: [...temp], highlights: { [i + 1]: 'sorted' }, line: 5, desc: `Đưa pivot về vị trí phân hoạch chính xác: arr[${i + 1}] = ${pivotVal}` });
+
         let p = i + 1;
         quick(l, p - 1);
         quick(p + 1, r);
       }
-      
+
       quick(0, temp.length - 1);
       let hlAll = {};
       for (let k = 0; k < temp.length; k++) hlAll[k] = 'sorted';
       steps.push({ array: [...temp], highlights: hlAll, line: 1, desc: "Mảng đã hoàn thành Quick Sort!" });
       return steps;
     },
-    counting_sort: function(arr) {
+    counting_sort: function (arr) {
       let steps = [];
       let temp = [...arr];
       let maxVal = Math.max(...temp);
@@ -299,12 +299,12 @@ const dynamicGenerators = {
       let range = maxVal - minVal + 1;
       let count = Array(range).fill(0);
       steps.push({ array: [...temp], highlights: {}, line: 1, desc: "Counting Sort: Khởi tạo mảng đếm tần suất." });
-      
+
       for (let i = 0; i < temp.length; i++) {
         count[temp[i] - minVal]++;
         steps.push({ array: [...temp], highlights: { [i]: 'compare' }, line: 2, desc: `Đếm: arr[${i}] = ${temp[i]} (Tần suất hiện tại = ${count[temp[i] - minVal]})` });
       }
-      
+
       let k = 0;
       for (let i = 0; i < range; i++) {
         while (count[i] > 0) {
@@ -325,14 +325,14 @@ const dynamicGenerators = {
 
   // --- SEARCHING FAMILY ---
   searching: {
-    jump: function(arr, target) {
+    jump: function (arr, target) {
       let sortedArr = [...arr].sort((a, b) => a - b);
       let steps = [];
       let n = sortedArr.length;
       let step = Math.floor(Math.sqrt(n));
       let prev = 0;
       steps.push({ array: [...sortedArr], highlights: {}, line: 1, desc: `Jump Search: Mảng được tự động sắp xếp. Bước nhảy step = √${n} = ${step}` });
-      
+
       while (sortedArr[Math.min(step, n) - 1] < target) {
         let hl = {};
         for (let k = prev; k < Math.min(step, n); k++) hl[k] = 'compare';
@@ -344,9 +344,9 @@ const dynamicGenerators = {
           return steps;
         }
       }
-      
+
       steps.push({ array: [...sortedArr], highlights: { [prev]: 'pivot', [Math.min(step, n) - 1]: 'pivot' }, line: 4, desc: `Tìm thấy khoảng chứa Target: [${prev} .. ${Math.min(step, n) - 1}]. Quét tuyến tính.` });
-      
+
       let found = false;
       while (sortedArr[prev] < target) {
         steps.push({ array: [...sortedArr], highlights: { [prev]: 'compare' }, line: 5, desc: `Quét tuyến tính: arr[${prev}] = ${sortedArr[prev]} < ${target}` });
@@ -360,26 +360,26 @@ const dynamicGenerators = {
       }
       return steps;
     },
-    ternary: function(arr, target) {
+    ternary: function (arr, target) {
       let sortedArr = [...arr].sort((a, b) => a - b);
       let steps = [];
       steps.push({ array: [...sortedArr], highlights: {}, line: 1, desc: `Ternary Search cho Target = ${target}` });
-      
+
       let low = 0, high = sortedArr.length - 1;
       let found = false;
       while (low <= high) {
         let mid1 = low + Math.floor((high - low) / 3);
         let mid2 = high - Math.floor((high - low) / 3);
-        
+
         let hl = {};
         for (let k = 0; k < sortedArr.length; k++) {
           if (k < low || k > high) hl[k] = 'skipped';
         }
         hl[mid1] = 'compare';
         hl[mid2] = 'compare';
-        
+
         steps.push({ array: [...sortedArr], highlights: { ...hl }, low, high, line: 2, desc: `Tính mid1 = ${mid1} (${sortedArr[mid1]}), mid2 = ${mid2} (${sortedArr[mid2]})` });
-        
+
         if (sortedArr[mid1] === target) {
           hl[mid1] = 'match';
           steps.push({ array: [...sortedArr], highlights: { ...hl }, line: 3, desc: `Tìm thấy Target tại mid1 = ${mid1}!` });
@@ -392,7 +392,7 @@ const dynamicGenerators = {
           found = true;
           break;
         }
-        
+
         if (target < sortedArr[mid1]) {
           high = mid1 - 1;
           steps.push({ array: [...sortedArr], highlights: {}, low, high, line: 4, desc: `Target < arr[mid1]. Thu hẹp sang nửa trái: [Low..mid1-1]` });
@@ -416,13 +416,13 @@ const dynamicGenerators = {
 
   // --- DYNAMIC PROGRAMMING FAMILY ---
   dp: {
-    fib_dp: function() {
+    fib_dp: function () {
       let n = 10;
       let dpTable = [Array(n + 1).fill(null)];
       let cols = Array(n + 1).fill(0).map((_, idx) => `F(${idx})`);
       let rows = ["Giá trị"];
       let steps = [];
-      
+
       steps.push({
         dpTable: dpTable.map(r => [...r]),
         dpRows: rows,
@@ -430,7 +430,7 @@ const dynamicGenerators = {
         line: 1,
         desc: "Khởi tạo bảng Quy hoạch động tính Fibonacci thứ 10 (F(10))."
       });
-      
+
       dpTable[0][0] = 0;
       steps.push({
         dpTable: dpTable.map(r => [...r]),
@@ -440,7 +440,7 @@ const dynamicGenerators = {
         line: 2,
         desc: "Trường hợp cơ sở: F(0) = 0"
       });
-      
+
       dpTable[0][1] = 1;
       steps.push({
         dpTable: dpTable.map(r => [...r]),
@@ -450,14 +450,14 @@ const dynamicGenerators = {
         line: 2,
         desc: "Trường hợp cơ sở: F(1) = 1"
       });
-      
+
       for (let i = 2; i <= n; i++) {
         let hls = {};
-        hls[`0,${i-1}`] = 'compare';
-        hls[`0,${i-2}`] = 'compare';
+        hls[`0,${i - 1}`] = 'compare';
+        hls[`0,${i - 2}`] = 'compare';
         dpTable[0][i] = dpTable[0][i - 1] + dpTable[0][i - 2];
-        hls[`0,${i-1}`] = 'active';
-        hls[`0,${i-2}`] = 'active';
+        hls[`0,${i - 1}`] = 'active';
+        hls[`0,${i - 2}`] = 'active';
         steps.push({
           dpTable: dpTable.map(r => [...r]),
           dpRows: rows,
@@ -465,10 +465,10 @@ const dynamicGenerators = {
           currentCell: [0, i],
           highlights: hls,
           line: 3,
-          desc: `Tính toán: F(${i}) = F(${i-1}) + F(${i-2}) = ${dpTable[0][i-1]} + ${dpTable[0][i-2]} = ${dpTable[0][i]}`
+          desc: `Tính toán: F(${i}) = F(${i - 1}) + F(${i - 2}) = ${dpTable[0][i - 1]} + ${dpTable[0][i - 2]} = ${dpTable[0][i]}`
         });
       }
-      
+
       steps.push({
         dpTable: dpTable.map(r => [...r]),
         dpRows: rows,
@@ -478,17 +478,17 @@ const dynamicGenerators = {
       });
       return steps;
     },
-    lcs_dp: function() {
+    lcs_dp: function () {
       let s1 = "STONE";
       let s2 = "LONGEST";
       let m = s1.length;
       let n = s2.length;
-      
+
       let dpTable = Array(m + 1).fill(null).map(() => Array(n + 1).fill(null));
       let steps = [];
       let rows = ["-", ...s1.split("")];
       let cols = ["-", ...s2.split("")];
-      
+
       steps.push({
         dpTable: dpTable.map(r => [...r]),
         dpRows: rows,
@@ -496,12 +496,12 @@ const dynamicGenerators = {
         line: 1,
         desc: "Quy hoạch động LCS: Khởi tạo bảng với chuỗi A = 'STONE' và B = 'LONGEST'."
       });
-      
+
       for (let i = 0; i <= m; i++) {
         for (let j = 0; j <= n; j++) {
           let hls = {};
           let currentCell = [i, j];
-          
+
           if (i === 0 || j === 0) {
             dpTable[i][j] = 0;
             steps.push({
@@ -513,13 +513,13 @@ const dynamicGenerators = {
               desc: `Trường hợp cơ sở: Hàng/cột biên đầu tiên. dp[${i}][${j}] = 0`
             });
           } else {
-            hls[`${i-1},${j-1}`] = 'compare';
-            hls[`${i-1},${j}`] = 'compare';
-            hls[`${i},${j-1}`] = 'compare';
-            
+            hls[`${i - 1},${j - 1}`] = 'compare';
+            hls[`${i - 1},${j}`] = 'compare';
+            hls[`${i},${j - 1}`] = 'compare';
+
             if (s1[i - 1] === s2[j - 1]) {
               dpTable[i][j] = dpTable[i - 1][j - 1] + 1;
-              hls[`${i-1},${j-1}`] = 'match';
+              hls[`${i - 1},${j - 1}`] = 'match';
               steps.push({
                 dpTable: dpTable.map(r => [...r]),
                 dpRows: rows,
@@ -527,12 +527,12 @@ const dynamicGenerators = {
                 currentCell,
                 highlights: hls,
                 line: 3,
-                desc: `Khớp ký tự: '${s1[i-1]}' === '${s2[j-1]}'. dp[${i}][${j}] = dp[${i-1}][${j-1}] + 1 = ${dpTable[i][j]}`
+                desc: `Khớp ký tự: '${s1[i - 1]}' === '${s2[j - 1]}'. dp[${i}][${j}] = dp[${i - 1}][${j - 1}] + 1 = ${dpTable[i][j]}`
               });
             } else {
               dpTable[i][j] = Math.max(dpTable[i - 1][j], dpTable[i][j - 1]);
-              hls[`${i-1},${j}`] = 'active';
-              hls[`${i},${j-1}`] = 'active';
+              hls[`${i - 1},${j}`] = 'active';
+              hls[`${i},${j - 1}`] = 'active';
               steps.push({
                 dpTable: dpTable.map(r => [...r]),
                 dpRows: rows,
@@ -540,13 +540,13 @@ const dynamicGenerators = {
                 currentCell,
                 highlights: hls,
                 line: 4,
-                desc: `Khác ký tự: '${s1[i-1]}' !== '${s2[j-1]}'. dp[${i}][${j}] = max(dp[${i-1}][${j}], dp[${i}][${j-1}]) = ${dpTable[i][j]}`
+                desc: `Khác ký tự: '${s1[i - 1]}' !== '${s2[j - 1]}'. dp[${i}][${j}] = max(dp[${i - 1}][${j}], dp[${i}][${j - 1}]) = ${dpTable[i][j]}`
               });
             }
           }
         }
       }
-      
+
       steps.push({
         dpTable: dpTable.map(r => [...r]),
         dpRows: rows,
@@ -554,20 +554,20 @@ const dynamicGenerators = {
         line: 5,
         desc: `Hoàn tất! LCS của hai chuỗi có độ dài bằng ${dpTable[m][n]}.`
       });
-      
+
       return steps;
     },
-    knapsack_dp: function() {
+    knapsack_dp: function () {
       let weights = [2, 3, 4, 5];
       let values = [3, 4, 5, 6];
       let W = 5;
       let n = weights.length;
       let dpTable = Array(n + 1).fill(null).map(() => Array(W + 1).fill(null));
       let steps = [];
-      
+
       let rows = ["-", "Vật 1 (w=2,v=3)", "Vật 2 (w=3,v=4)", "Vật 3 (w=4,v=5)", "Vật 4 (w=5,v=6)"];
       let cols = Array(W + 1).fill(0).map((_, idx) => `W=${idx}`);
-      
+
       steps.push({
         dpTable: dpTable.map(r => [...r]),
         dpRows: rows,
@@ -575,7 +575,7 @@ const dynamicGenerators = {
         line: 1,
         desc: "Khởi tạo bảng Quy hoạch động Knapsack 0/1. Sức chứa tối đa W = 5."
       });
-      
+
       for (let i = 0; i <= n; i++) {
         for (let w = 0; w <= W; w++) {
           let currentCell = [i, w];
@@ -591,15 +591,15 @@ const dynamicGenerators = {
               desc: `Trường hợp cơ sở: dp[${i}][${w}] = 0 (Không vật hoặc túi rỗng)`
             });
           } else if (weights[i - 1] <= w) {
-            hls[`${i-1},${w}`] = 'compare';
-            hls[`${i-1},${w-weights[i-1]}`] = 'compare';
-            
+            hls[`${i - 1},${w}`] = 'compare';
+            hls[`${i - 1},${w - weights[i - 1]}`] = 'compare';
+
             let valWith = values[i - 1] + dpTable[i - 1][w - weights[i - 1]];
             let valWithout = dpTable[i - 1][w];
-            
+
             dpTable[i][w] = Math.max(valWith, valWithout);
-            hls[`${i-1},${w}`] = 'active';
-            hls[`${i-1},${w-weights[i-1]}`] = 'active';
+            hls[`${i - 1},${w}`] = 'active';
+            hls[`${i - 1},${w - weights[i - 1]}`] = 'active';
             steps.push({
               dpTable: dpTable.map(r => [...r]),
               dpRows: rows,
@@ -607,12 +607,12 @@ const dynamicGenerators = {
               currentCell,
               highlights: hls,
               line: 3,
-              desc: `Vật ${i} vừa túi (w=${weights[i-1]} <= ${w}). Chọn max(Chọn vật: ${valWith}, Bỏ vật: ${valWithout}) = ${dpTable[i][w]}`
+              desc: `Vật ${i} vừa túi (w=${weights[i - 1]} <= ${w}). Chọn max(Chọn vật: ${valWith}, Bỏ vật: ${valWithout}) = ${dpTable[i][w]}`
             });
           } else {
-            hls[`${i-1},${w}`] = 'compare';
+            hls[`${i - 1},${w}`] = 'compare';
             dpTable[i][w] = dpTable[i - 1][w];
-            hls[`${i-1},${w}`] = 'active';
+            hls[`${i - 1},${w}`] = 'active';
             steps.push({
               dpTable: dpTable.map(r => [...r]),
               dpRows: rows,
@@ -620,12 +620,12 @@ const dynamicGenerators = {
               currentCell,
               highlights: hls,
               line: 4,
-              desc: `Vật ${i} không túi (w=${weights[i-1]} > ${w}). Giữ nguyên giá trị tối ưu: dp[${i}][${w}] = dp[${i-1}][${w}] = ${dpTable[i][w]}`
+              desc: `Vật ${i} không túi (w=${weights[i - 1]} > ${w}). Giữ nguyên giá trị tối ưu: dp[${i}][${w}] = dp[${i - 1}][${w}] = ${dpTable[i][w]}`
             });
           }
         }
       }
-      
+
       steps.push({
         dpTable: dpTable.map(r => [...r]),
         dpRows: rows,
@@ -646,7 +646,7 @@ function getAlgorithmGenerator(algoId, catId) {
   }
 
   // Else construct dynamic fallback generator based on category/id
-  return function(arr, target) {
+  return function (arr, target) {
     if (algoId === "euclidean") {
       let a = 48, b = 18;
       let steps = [];
@@ -661,7 +661,7 @@ function getAlgorithmGenerator(algoId, catId) {
       steps.push({ consoleOut: `Hoàn tất! GCD tìm được là ${a}.`, line: 1 });
       return steps;
     }
-    
+
     if (algoId === "fast_exponentiation") {
       let base = 2, exp = 10;
       let steps = [];
@@ -690,12 +690,12 @@ function getAlgorithmGenerator(algoId, catId) {
       for (let i = 0; i < arrTest.length; i++) {
         let prev = val;
         val ^= arrTest[i];
-        steps.push({ consoleOut: `Bước ${i+1}: Duyệt số ${arrTest[i]}. Phép tính: ${prev} ^ ${arrTest[i]} = ${val} (Nhị phân: ${val.toString(2)})`, line: 2 });
+        steps.push({ consoleOut: `Bước ${i + 1}: Duyệt số ${arrTest[i]}. Phép tính: ${prev} ^ ${arrTest[i]} = ${val} (Nhị phân: ${val.toString(2)})`, line: 2 });
       }
       steps.push({ consoleOut: `Số duy nhất xuất hiện lẻ lần là: ${val}`, line: 3 });
       return steps;
     }
-    
+
     if (algoId === "naive_string") {
       let text = "ABABDABACD";
       let pat = "ABAC";
@@ -706,7 +706,7 @@ function getAlgorithmGenerator(algoId, catId) {
         let matched = true;
         for (let j = 0; j < pat.length; j++) {
           if (text[i + j] !== pat[j]) {
-            steps.push({ consoleOut: `  Không khớp tại vị trí ${j}: '${text[i+j]}' !== '${pat[j]}'`, line: 3 });
+            steps.push({ consoleOut: `  Không khớp tại vị trí ${j}: '${text[i + j]}' !== '${pat[j]}'`, line: 3 });
             matched = false;
             break;
           }
@@ -732,7 +732,7 @@ function getAlgorithmGenerator(algoId, catId) {
       let handler = dynamicGenerators.dp[algoId] || dynamicGenerators.dp.fib_dp;
       return handler();
     }
-    
+
     // Default generic console generator
     return [
       { consoleOut: `Khởi chạy Terminal giả lập cho giải thuật: [${algoId}].\nĐang tiền xử lý tham số...`, line: 1 },

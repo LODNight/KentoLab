@@ -11,6 +11,13 @@ let activeCategoryId = "searching";
 let currentMode = "play"; // 'play' (Playground) or 'learn' (Theory)
 let currentView = "dashboard"; // 'dashboard' (shows grid cards) or 'workspace' (shows live playground)
 
+// List of officially supported interactive simulation algorithms
+const playgroundAlgos = ["linear", "binary", "bubble", "selection", "bfs", "dfs", "dijkstra_graph", "sieve_primes"];
+
+function hasPlayground(algoId) {
+  return playgroundAlgos.includes(algoId);
+}
+
 // Audio State variables
 let audioCtx = null;
 let isSoundOn = false;
@@ -164,26 +171,39 @@ function renderMegaGroupDashboard(groupId) {
     cardsGrid.className = "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mt-3";
 
     category.algos.forEach(algo => {
+      const isPlayable = hasPlayground(algo.id);
       let difficultyColor = "bg-emerald-950 text-emerald-400 border-emerald-500/20";
       if (algo.diff === "Medium") difficultyColor = "bg-amber-950 text-amber-400 border-amber-500/20";
       if (algo.diff === "Hard") difficultyColor = "bg-rose-950 text-rose-400 border-rose-500/20";
 
       const card = document.createElement("div");
-      card.className = "bg-slate-900 border border-slate-800 rounded-xl p-4 hover:border-indigo-500/50 hover:shadow-lg hover:shadow-indigo-500/5 transition cursor-pointer flex flex-col justify-between space-y-3 group";
+      
+      if (isPlayable) {
+        card.className = "bg-slate-900 border border-slate-800 rounded-xl p-4 hover:border-indigo-500/50 hover:shadow-lg hover:shadow-indigo-500/5 transition cursor-pointer flex flex-col justify-between space-y-3 group";
+      } else {
+        // Semi-transparent lock style
+        card.className = "bg-slate-900/60 border border-slate-800/80 rounded-xl p-4 hover:border-slate-700 hover:shadow-md transition cursor-pointer flex flex-col justify-between space-y-3 group opacity-75 hover:opacity-100";
+      }
+
+      const statusBadge = isPlayable 
+        ? `<span class="px-1.5 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-[8px] font-extrabold uppercase tracking-wider"><i class="fa-solid fa-flask-vial mr-1 animate-pulse"></i>Chạy thử</span>`
+        : `<span class="px-1.5 py-0.5 rounded bg-slate-850 text-slate-500 border border-slate-850 text-[8px] font-extrabold uppercase tracking-wider"><i class="fa-solid fa-book mr-1"></i>Lý thuyết</span>`;
+
       card.onclick = () => selectAlgorithm(algo.id, category.id);
       card.innerHTML = `
             <div class="space-y-1">
               <div class="flex items-center justify-between">
                 <span class="px-2 py-0.5 rounded border text-[9px] font-bold ${difficultyColor}">${algo.diff}</span>
-                <span class="text-[10px] code-font text-slate-500">${algo.time}</span>
+                ${statusBadge}
               </div>
-              <h5 class="text-sm font-bold text-white group-hover:text-indigo-400 transition flex items-center gap-1">
+              <h5 class="text-sm font-bold text-white group-hover:text-indigo-400 transition flex items-center gap-1.5">
+                ${!isPlayable ? '<i class="fa-solid fa-lock text-slate-500 text-[10px]"></i>' : ''}
                 <span>${algo.name}</span>
                 <i class="fa-solid fa-arrow-up-right-from-square text-[10px] opacity-0 group-hover:opacity-100 transition"></i>
               </h5>
             </div>
             <p class="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">
-              ${algorithmDatabase[algo.id] ? algorithmDatabase[algo.id].details.shortSummary : "Khám phá phòng thí nghiệm và trực quan hóa chi tiết của thuật toán này."}
+              ${algorithmDatabase[algo.id] ? algorithmDatabase[algo.id].details.shortSummary : "Khám phá phòng thí nghiệm học thuật chuyên sâu và lý thuyết của thuật toán này."}
             </p>
           `;
       cardsGrid.appendChild(card);
@@ -484,6 +504,23 @@ function selectAlgorithm(algoId, catId) {
   activeCategoryId = catId;
   currentView = "workspace";
   pausePlayback();
+
+  const isPlayable = hasPlayground(algoId);
+
+  // Mode Switcher Controls
+  const modePlayBtn = document.getElementById("mode-play-btn");
+  if (isPlayable) {
+    modePlayBtn.disabled = false;
+    modePlayBtn.className = `flex items-center gap-1.5 px-3 py-1 text-xs font-semibold transition ${currentMode === 'play' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'} rounded`;
+    modePlayBtn.innerHTML = `<i class="fa-solid fa-flask-vial"></i> <span>Chạy Thử</span>`;
+  } else {
+    // Disabled style showing lock
+    modePlayBtn.disabled = true;
+    modePlayBtn.className = "flex items-center gap-1.5 px-3 py-1 text-xs font-semibold transition bg-slate-900 text-slate-600 rounded cursor-not-allowed opacity-45";
+    modePlayBtn.innerHTML = `<i class="fa-solid fa-lock text-[10px] mr-1"></i> <span>Chạy Thử</span>`;
+    // Force learn mode directly
+    currentMode = 'learn';
+  }
 
   // Locate profile from DB
   let profile = algorithmDatabase[algoId];
@@ -920,6 +957,11 @@ function toggleSoundEngine() {
 
 // Switch view modes: Playground (play) vs Theory (learn)
 function switchMode(mode) {
+  if (mode === 'play' && !hasPlayground(activeAlgoId)) {
+    showToast("Thuật toán này hiện chỉ hỗ trợ tài liệu học thuật (Lý thuyết)!", "error");
+    return;
+  }
+
   currentMode = mode;
   const playBtn = document.getElementById("mode-play-btn");
   const learnBtn = document.getElementById("mode-learn-btn");
@@ -928,12 +970,16 @@ function switchMode(mode) {
   const learnDiv = document.getElementById("learn-container");
 
   if (mode === "play") {
-    playBtn.className = "flex items-center gap-1.5 px-3 py-1 rounded text-xs font-semibold transition bg-indigo-600 text-white shadow";
+    if (hasPlayground(activeAlgoId)) {
+      playBtn.className = "flex items-center gap-1.5 px-3 py-1 rounded text-xs font-semibold transition bg-indigo-600 text-white shadow";
+    }
     learnBtn.className = "flex items-center gap-1.5 px-3 py-1 rounded text-xs font-semibold transition text-slate-400 hover:text-slate-200";
     sandboxDiv.classList.remove("hidden");
     learnDiv.classList.add("hidden");
   } else {
-    playBtn.className = "flex items-center gap-1.5 px-3 py-1 rounded text-xs font-semibold transition text-slate-400 hover:text-slate-200";
+    if (hasPlayground(activeAlgoId)) {
+      playBtn.className = "flex items-center gap-1.5 px-3 py-1 rounded text-xs font-semibold transition text-slate-400 hover:text-slate-200";
+    }
     learnBtn.className = "flex items-center gap-1.5 px-3 py-1 rounded text-xs font-semibold transition bg-indigo-600 text-white shadow";
     sandboxDiv.classList.add("hidden");
     learnDiv.classList.remove("hidden");
@@ -1044,26 +1090,37 @@ algoSearchInput.addEventListener("input", function (e) {
     category.algos.forEach(algo => {
       if (algo.name.toLowerCase().includes(query) || category.name.toLowerCase().includes(query)) {
         matchCount++;
+        const isPlayable = hasPlayground(algo.id);
         let difficultyColor = "bg-emerald-950 text-emerald-400 border-emerald-500/20";
         if (algo.diff === "Medium") difficultyColor = "bg-amber-950 text-amber-400 border-amber-500/20";
         if (algo.diff === "Hard") difficultyColor = "bg-rose-950 text-rose-400 border-rose-500/20";
 
         const card = document.createElement("div");
-        card.className = "bg-slate-900 border border-slate-800 rounded-xl p-4 hover:border-indigo-500/50 hover:shadow-lg hover:shadow-indigo-500/5 transition cursor-pointer flex flex-col justify-between space-y-3 group";
+        if (isPlayable) {
+          card.className = "bg-slate-900 border border-slate-800 rounded-xl p-4 hover:border-indigo-500/50 hover:shadow-lg hover:shadow-indigo-500/5 transition cursor-pointer flex flex-col justify-between space-y-3 group";
+        } else {
+          card.className = "bg-slate-900/60 border border-slate-800/80 rounded-xl p-4 hover:border-slate-700 hover:shadow-md transition cursor-pointer flex flex-col justify-between space-y-3 group opacity-75 hover:opacity-100";
+        }
+
+        const statusBadge = isPlayable 
+          ? `<span class="px-1.5 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-[8px] font-extrabold uppercase tracking-wider"><i class="fa-solid fa-flask-vial mr-1"></i>Chạy thử</span>`
+          : `<span class="px-1.5 py-0.5 rounded bg-slate-850 text-slate-500 border border-slate-850 text-[8px] font-extrabold uppercase tracking-wider"><i class="fa-solid fa-book mr-1"></i>Lý thuyết</span>`;
+
         card.onclick = () => selectAlgorithm(algo.id, category.id);
         card.innerHTML = `
               <div class="space-y-1">
                 <div class="flex items-center justify-between">
                   <span class="px-2 py-0.5 rounded border text-[9px] font-bold ${difficultyColor}">${algo.diff}</span>
-                  <span class="text-[10px] code-font text-indigo-400">${category.name.replace(/\d+\.\s+/, "")}</span>
+                  ${statusBadge}
                 </div>
-                <h5 class="text-sm font-bold text-white group-hover:text-indigo-400 transition flex items-center gap-1">
+                <h5 class="text-sm font-bold text-white group-hover:text-indigo-400 transition flex items-center gap-1.5">
+                  ${!isPlayable ? '<i class="fa-solid fa-lock text-slate-500 text-[10px]"></i>' : ''}
                   <span>${algo.name}</span>
                   <i class="fa-solid fa-arrow-up-right-from-square text-[10px] opacity-0 group-hover:opacity-100 transition"></i>
                 </h5>
               </div>
               <p class="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">
-                ${algorithmDatabase[algo.id] ? algorithmDatabase[algo.id].details.shortSummary : "Khám phá phòng thí nghiệm và trực quan hóa chi tiết của thuật toán này."}
+                ${algorithmDatabase[algo.id] ? algorithmDatabase[algo.id].details.shortSummary : "Khám phá phòng thí nghiệm học thuật chuyên sâu và lý thuyết của thuật toán này."}
               </p>
             `;
         resultsGrid.appendChild(card);

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   AlgoMaster Lab - Academic Encyclopedia Database
+   Kento Lab - Academic Encyclopedia Database
    ========================================================================== */
 
 // 1. System definitions of 31 Categories (Structured mapping)
@@ -683,6 +683,108 @@ const hardcodedDatabase = {
         { num: 5, text: "      prime[i] = false" }
       ]
     }
+  },
+  "bfs": {
+    name: "Breadth First Search (BFS)",
+    details: {
+      category: "graphs",
+      vType: "graph",
+      complexity: {
+        best: "O(V + E)",
+        avg: "O(V + E)",
+        worst: "O(V + E)",
+        space: "O(V)"
+      },
+      shortSummary: "Duyệt đồ thị theo chiều rộng, lan tỏa dần từ đỉnh gốc ra các đỉnh lân cận như sóng nước.",
+      concept: "BFS là thuật toán tìm kiếm và duyệt trên đồ thị/cây. Bắt đầu từ một đỉnh gốc, thuật toán sẽ duyệt tất cả các đỉnh kề trực tiếp với nó trước khi tiến sâu hơn xuống các tầng tiếp theo.",
+      conditions: "Cần cấu trúc dữ liệu Hàng đợi (Queue) để lưu trữ các đỉnh đang chờ xử lý.",
+      idea: "Dùng Queue và mảng Visited. Đưa đỉnh xuất phát vào Queue và đánh dấu Visited. Lặp lại việc lấy đỉnh u khỏi Queue, lấy tất cả các đỉnh lân cận v chưa Visited của u đưa vào Queue. Lặp đến khi Queue rỗng.",
+      guide: "Thêm đỉnh (Node) và nối Cạnh (Edge) tùy ý trên Canvas đồ thị. Bấm trực tiếp vào đỉnh bạn muốn làm gốc xuất phát. Hệ thống sẽ mô phỏng lan truyền từ đỉnh đó theo từng mức.",
+      pseudocode: "procedure BFS(G, start)\n  Q = empty queue\n  Q.enqueue(start)\n  visited[start] = true\n  while Q is not empty do\n    u = Q.dequeue()\n    for each v in G.adjacent(u) do\n      if not visited[v] then\n        visited[v] = true\n        Q.enqueue(v)\nend procedure",
+      sourceCode: {
+        cpp: `// Mã nguồn mẫu C++: BFS (Breadth-First Search)\n#include <iostream>\n#include <vector>\n#include <queue>\n\nvoid bfs(int start, const std::vector<std::vector<int>>& adj) {\n    std::vector<bool> visited(adj.size(), false);\n    std::queue<int> q;\n    \n    visited[start] = true;\n    q.push(start);\n    \n    while (!q.empty()) {\n        int u = q.front();\n        q.pop();\n        std::cout << "Đã duyệt: " << u << std::endl;\n        \n        for (int v : adj[u]) {\n            if (!visited[v]) {\n                visited[v] = true;\n                q.push(v);\n            }\n        }\n    }\n}`,
+        python: `# Mã nguồn mẫu Python: BFS (Breadth-First Search)\nfrom collections import deque\n\ndef bfs(start, adj):\n    visited = [False] * len(adj)\n    q = deque([start])\n    visited[start] = True\n    \n    while q:\n        u = q.popleft()\n        print(f"Đã duyệt: {u}")\n        \n        for v in adj[u]:\n            if not visited[v]:\n                visited[v] = True\n                q.append(v)`
+      },
+      apps: ["Tìm đường đi ngắn nhất trên đồ thị không trọng số.", "Thuật toán loang (Flood fill) trong xử lý ảnh.", "Mạng xã hội để tìm bạn bè chung gần nhất."],
+      exercises: [
+        { name: "LeetCode 200. Number of Islands", diff: "Medium", url: "#" }
+      ],
+      codeTrace: [
+        { num: 1, text: "Q.enqueue(start), visited[start] = true" },
+        { num: 2, text: "while Q is not empty do" },
+        { num: 3, text: "  u = Q.dequeue()" },
+        { num: 4, text: "  for each v in G.adjacent(u) do" },
+        { num: 5, text: "    if not visited[v]: Q.enqueue(v)" }
+      ]
+    }
+  },
+  "dfs": {
+    name: "Depth First Search (DFS)",
+    details: {
+      category: "graphs",
+      vType: "graph",
+      complexity: {
+        best: "O(V + E)",
+        avg: "O(V + E)",
+        worst: "O(V + E)",
+        space: "O(V)"
+      },
+      shortSummary: "Duyệt đồ thị theo chiều sâu, ưu tiên đi đến tận cùng của một nhánh trước khi quay lui.",
+      concept: "DFS là một giải thuật duyệt đồ thị/cây hoạt động theo nguyên tắc đệ quy (hoặc dùng ngăn xếp). Nó đi theo một nhánh con sâu nhất có thể cho đến khi không còn đường đi, rồi Backtrack (quay lui) về để thử nhánh khác.",
+      conditions: "Có thể cài đặt đệ quy thông qua Call Stack của hệ điều hành, hoặc dùng Stack (Ngăn xếp) tường minh.",
+      idea: "Hàm DFS(u): đánh dấu u là Visited. Lặp qua tất cả đỉnh kề v của u. Nếu v chưa Visited, gọi đệ quy DFS(v). Cứ như thế đồ thị sẽ được quét hết theo từng nhánh sâu.",
+      guide: "Thêm đỉnh (Node) và nối Cạnh (Edge) tùy ý trên Canvas đồ thị. Bấm trực tiếp vào đỉnh bạn muốn làm gốc xuất phát. Hệ thống sẽ mô phỏng đi sâu và quay lui.",
+      pseudocode: "procedure DFS(u, visited)\n  visited[u] = true\n  for each v in G.adjacent(u) do\n    if not visited[v] then\n      DFS(v, visited)\nend procedure",
+      sourceCode: {
+        cpp: `// Mã nguồn mẫu C++: DFS (Depth-First Search)\n#include <iostream>\n#include <vector>\n\nvoid dfs(int u, const std::vector<std::vector<int>>& adj, std::vector<bool>& visited) {\n    visited[u] = true;\n    std::cout << "Đã duyệt: " << u << std::endl;\n    \n    for (int v : adj[u]) {\n        if (!visited[v]) {\n            dfs(v, adj, visited);\n        }\n    }\n}`,
+        python: `# Mã nguồn mẫu Python: DFS (Depth-First Search)\ndef dfs(u, adj, visited):\n    visited[u] = True\n    print(f"Đã duyệt: {u}")\n    \n    for v in adj[u]:\n        if not visited[v]:\n            dfs(v, adj, visited)`
+      },
+      apps: ["Tìm kiếm chu trình (Cycle detection) trong đồ thị.", "Sắp xếp tô-pô (Topological Sort).", "Giải mê cung (Maze solving)."],
+      exercises: [
+        { name: "LeetCode 547. Number of Provinces", diff: "Medium", url: "#" }
+      ],
+      codeTrace: [
+        { num: 1, text: "visited[u] = true" },
+        { num: 2, text: "for each v in G.adjacent(u) do" },
+        { num: 3, text: "  if not visited[v] then" },
+        { num: 4, text: "    DFS(v)" }
+      ]
+    }
+  },
+  "dijkstra_graph": {
+    name: "Dijkstra Algorithm",
+    details: {
+      category: "graphs",
+      vType: "graph",
+      complexity: {
+        best: "O(E + V log V)",
+        avg: "O(E + V log V)",
+        worst: "O(E + V log V)",
+        space: "O(V)"
+      },
+      shortSummary: "Tìm đường đi ngắn nhất từ một đỉnh gốc tới tất cả các đỉnh khác trên đồ thị có trọng số dương.",
+      concept: "Thuật toán Dijkstra thuộc nhóm Tham lam (Greedy). Nó duy trì một mảng khoảng cách ngắn nhất từ đỉnh gốc, và tại mỗi bước chọn ra đỉnh có khoảng cách nhỏ nhất chưa xét để cập nhật khoảng cách cho các đỉnh láng giềng.",
+      conditions: "Trọng số của tất cả các cạnh trên đồ thị phải là KHÔNG ÂM (>= 0). Nếu có cạnh âm, phải dùng Bellman-Ford.",
+      idea: "Khởi tạo khoảng cách mảng dist[] = vô cực, dist[start] = 0. Tại mỗi bước, lấy đỉnh u có dist[u] nhỏ nhất ra khỏi tập chưa xét (dùng Priority Queue). Cập nhật đỉnh kề v: nếu dist[u] + weight(u,v) < dist[v] thì dist[v] = dist[u] + weight(u,v).",
+      guide: "Thêm đỉnh và nối cạnh (trọng số sẽ tự sinh ngẫu nhiên). Bấm vào một đỉnh để hệ thống chạy mô phỏng loang tìm đường đi ngắn nhất từ đỉnh đó đi khắp đồ thị.",
+      pseudocode: "procedure Dijkstra(G, start)\n  dist[v] = infinity for all v\n  dist[start] = 0\n  Q = priority_queue of all nodes\n  while Q is not empty do\n    u = Q.extract_min()\n    for each v in neighbors(u) do\n      alt = dist[u] + weight(u, v)\n      if alt < dist[v]:\n        dist[v] = alt\n        Q.decrease_key(v, alt)\nend procedure",
+      sourceCode: {
+        cpp: `// Mã nguồn mẫu C++: Dijkstra's Shortest Path\n#include <iostream>\n#include <vector>\n#include <queue>\n#include <limits>\n\nconst int INF = std::numeric_limits<int>::max();\n\nvoid dijkstra(int start, const std::vector<std::vector<std::pair<int, int>>>& adj) {\n    std::vector<int> dist(adj.size(), INF);\n    // priority_queue lưu pair<dist, node>\n    std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, std::greater<>> pq;\n    \n    dist[start] = 0;\n    pq.push({0, start});\n    \n    while (!pq.empty()) {\n        int d = pq.top().first;\n        int u = pq.top().second;\n        pq.pop();\n        \n        if (d > dist[u]) continue;\n        \n        for (auto edge : adj[u]) {\n            int v = edge.first;\n            int weight = edge.second;\n            if (dist[u] + weight < dist[v]) {\n                dist[v] = dist[u] + weight;\n                pq.push({dist[v], v});\n            }\n        }\n    }\n}`,
+        python: `# Mã nguồn mẫu Python: Dijkstra's Shortest Path\nimport heapq\n\ndef dijkstra(start, adj):\n    dist = [float('inf')] * len(adj)\n    dist[start] = 0\n    pq = [(0, start)]\n    \n    while pq:\n        d, u = heapq.heappop(pq)\n        if d > dist[u]:\n            continue\n            \n        for v, weight in adj[u]:\n            if dist[u] + weight < dist[v]:\n                dist[v] = dist[u] + weight\n                heapq.heappush(pq, (dist[v], v))`
+      },
+      apps: ["Định tuyến mạng máy tính (Network routing OSPF).", "Chỉ đường trên Google Maps, GPS.", "AI cho nhân vật tìm đường trong game."],
+      exercises: [
+        { name: "LeetCode 743. Network Delay Time", diff: "Medium", url: "#" }
+      ],
+      codeTrace: [
+        { num: 1, text: "dist[start] = 0; Q = {all nodes}" },
+        { num: 2, text: "while Q is not empty do" },
+        { num: 3, text: "  u = Q.extract_min()" },
+        { num: 4, text: "  for v in neighbors(u) do" },
+        { num: 5, text: "    alt = dist[u] + weight(u, v)" },
+        { num: 6, text: "    if alt < dist[v]: dist[v] = alt" }
+      ]
+    }
   }
 };
 
@@ -699,7 +801,7 @@ function findAlgorithmMetadata(algoId) {
 function autoGenerateAlgorithmProfile(algoId, catId) {
   let meta = findAlgorithmMetadata(algoId);
   let algoObj = meta ? meta.algo : { name: algoId, time: "O(n)" };
-  
+
   // Predict visualizer type
   let vType = "console";
   if (catId === "sorting_comp" || catId === "sorting_noncomp") {
@@ -708,8 +810,10 @@ function autoGenerateAlgorithmProfile(algoId, catId) {
     vType = "array";
   } else if (catId === "dp") {
     vType = "dp-grid";
+  } else if (catId === "graphs" || catId === "trees") {
+    vType = "graph";
   }
-  
+
   // Custom Vietnamese Academic descriptions (static metadata only)
   return {
     name: algoObj.name,
@@ -726,11 +830,11 @@ function autoGenerateAlgorithmProfile(algoId, catId) {
       concept: `${algoObj.name} là giải thuật tối ưu nằm trong phân nhóm ${meta ? meta.category.name : catId}. Trực quan hóa giúp hiểu sâu nguyên lý cấu trúc hoạt động thực tiễn của giải thuật này.`,
       conditions: "Dữ liệu được nạp vào ở dạng chuẩn hóa, tương thích các cấu trúc dữ liệu cơ sở của hệ thống.",
       idea: `Duyệt qua không gian trạng thái, chia nhỏ các bài toán thành phần để xử lý độc lập tối ưu hiệu năng tính toán.`,
-      guide: vType === "array" 
+      guide: vType === "array"
         ? "Nhấn nút Play trên thanh điều khiển. Ô màu cam/vàng đại diện cho phần so sánh/duyệt, ô màu đỏ biểu thị hoán đổi, ô màu xanh biểu thị phần tử đã sắp xếp đúng vị trí."
         : vType === "dp-grid"
-        ? "Nhấn nút Play để nạp bảng quy hoạch động 2D. Tế bào màu vàng biểu thị ô đang tính toán, các ô màu xanh đại diện cho trạng thái tối ưu đã được lưu trữ."
-        : "Xem thông tin log dòng lệnh terminal phía dưới hiển thị chu kỳ chạy của các bước thuật toán.",
+          ? "Nhấn nút Play để nạp bảng quy hoạch động 2D. Tế bào màu vàng biểu thị ô đang tính toán, các ô màu xanh đại diện cho trạng thái tối ưu đã được lưu trữ."
+          : "Xem thông tin log dòng lệnh terminal phía dưới hiển thị chu kỳ chạy của các bước thuật toán.",
       pseudocode: `procedure ${algoId}(data)\n  // Khởi tạo các tham số lặp\n  for each element in data do\n    process(element)\nend procedure`,
       sourceCode: {
         cpp: `// Phiên bản mã nguồn mẫu C++ chuẩn hóa\n#include <iostream>\n\nvoid runAlgorithm() {\n    std::cout << "Algorithm ${algoObj.name} is running..." << std::endl;\n}`,
@@ -754,7 +858,7 @@ function autoGenerateAlgorithmProfile(algoId, catId) {
 
 // 7. Intercept database accesses to dynamically support all categories automatically and link dynamic executions
 const algorithmDatabase = new Proxy(hardcodedDatabase, {
-  get: function(target, prop) {
+  get: function (target, prop) {
     if (prop === "linear" || prop === "binary" || prop === "bubble" || prop === "selection" || prop === "sieve_primes") {
       let profile = target[prop];
       return {
@@ -764,14 +868,14 @@ const algorithmDatabase = new Proxy(hardcodedDatabase, {
         }
       };
     }
-    
+
     // Find category ID of this algorithm to generate profile
     let meta = findAlgorithmMetadata(prop);
     if (!meta) return undefined;
-    
+
     let catId = meta.category.id;
     let profile = autoGenerateAlgorithmProfile(prop, catId);
-    
+
     return {
       ...profile,
       execution: {

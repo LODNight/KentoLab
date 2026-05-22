@@ -1,5 +1,5 @@
 // src/core/engine.js
-import { arrayReducer, createInitialArrayState } from './stateMachine.js';
+// Removed specific imports for arrayReducer, instead rely on metadata or pass it dynamically.
 
 export class SimulationEngine {
   constructor(renderer, onStateChangeCallback) {
@@ -16,20 +16,21 @@ export class SimulationEngine {
   }
 
   // Khởi tạo thuật toán và nạp danh sách hành động
-  loadAlgorithm(generatorFn, inputData) {
+  loadAlgorithm(generatorFn, inputData, reducer, initialStateType) {
     this.pause();
     this.actions = [];
     this.historyStates = [];
     
-    // Khởi tạo State Machine
-    let currentState = createInitialArrayState();
+    // Khởi tạo State Machine dựa trên reducer và init state từ tham số truyền vào
+    // Nếu không truyền, mặc định sẽ lỗi vì engine yêu cầu 1 reducer
+    let currentState = initialStateType();
 
     // Chạy generator một lần duy nhất để lấy toàn bộ danh sách actions
     const generator = generatorFn(inputData);
     for (const action of generator) {
       this.actions.push(action);
       // Tính toán state tại bước này và lưu vào lịch sử
-      currentState = arrayReducer(currentState, action);
+      currentState = reducer(currentState, action);
       this.historyStates.push(currentState);
     }
 

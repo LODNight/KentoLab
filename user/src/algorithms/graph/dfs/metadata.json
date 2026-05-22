@@ -1,0 +1,13 @@
+{
+  "id": "dfs",
+  "name": "Duyệt theo chiều sâu (DFS)",
+  "categoryId": "graph",
+  "visualizerType": "GRAPH_2D",
+  "difficulty": "Easy",
+  "tags": ["graph", "traversal", "recursion"],
+  "description": "Thuật toán duyệt đồ thị ưu tiên đi sâu nhất có thể xuống một nhánh trước khi quay lui (Backtracking).",
+  "complexity": {
+    "time": { "worst": "O(V + E)" },
+    "space": { "worst": "O(V)" }
+  }
+}

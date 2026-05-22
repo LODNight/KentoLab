@@ -1,0 +1,13 @@
+{
+  "id": "bfs",
+  "name": "Duyệt theo chiều rộng (BFS)",
+  "categoryId": "graph",
+  "visualizerType": "GRAPH_2D",
+  "difficulty": "Easy",
+  "tags": ["graph", "traversal", "shortest-path"],
+  "description": "Thuật toán loang, thăm tất cả các đỉnh lân cận ở độ sâu hiện tại trước khi chuyển sang độ sâu tiếp theo.",
+  "complexity": {
+    "time": { "worst": "O(V + E)" },
+    "space": { "worst": "O(V)" }
+  }
+}

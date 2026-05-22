@@ -1,0 +1,13 @@
+{
+  "id": "dijkstra",
+  "name": "Đường đi ngắn nhất (Dijkstra)",
+  "categoryId": "graph",
+  "visualizerType": "GRAPH_2D",
+  "difficulty": "Medium",
+  "tags": ["graph", "shortest-path", "greedy"],
+  "description": "Thuật toán tìm đường đi ngắn nhất từ một đỉnh đến tất cả các đỉnh còn lại trên đồ thị có trọng số không âm.",
+  "complexity": {
+    "time": { "worst": "O(E log V)" },
+    "space": { "worst": "O(V)" }
+  }
+}

@@ -19,14 +19,30 @@
         <i class="fa-solid fa-flask text-indigo-500"></i>
         <span>KentoLab 2.0 <span class="text-slate-400 text-sm font-normal">| Core Engine Proof of Concept</span></span>
       </h1>
-      <div id="algo-name" class="px-3 py-1 bg-indigo-500/20 text-indigo-400 rounded text-sm font-semibold">Đang tải...</div>
+      <div class="flex gap-4 items-center">
+        <select id="algo-select" class="bg-slate-900 border border-slate-700 text-white text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block p-2">
+          <option value="bubble_sort">Bubble Sort</option>
+          <option value="bfs">Breadth-First Search (BFS)</option>
+          <option value="dfs">Depth-First Search (DFS)</option>
+          <option value="dijkstra">Dijkstra's Algorithm</option>
+        </select>
+        <div id="algo-name" class="px-3 py-1 bg-indigo-500/20 text-indigo-400 rounded text-sm font-semibold">Đang tải...</div>
+      </div>
     </div>
 
     <!-- Visualizer Canvas -->
-    <div class="p-8 h-64 flex flex-col items-center justify-center border-b border-slate-800 relative bg-slate-950/50">
+    <div class="p-8 h-80 flex flex-col items-center justify-center border-b border-slate-800 relative bg-slate-950/50">
       <div id="visualizer-container" class="flex items-end justify-center gap-4 h-full w-full">
-        <!-- Rendered elements will appear here -->
+        <!-- Rendered array elements will appear here -->
       </div>
+      <div id="graph-container" class="hidden absolute inset-0 w-full h-full overflow-hidden">
+        <!-- Graph Builder & SVG Renderer -->
+      </div>
+    </div>
+
+    <!-- Table Container (For Dijkstra/DP) -->
+    <div id="table-container" class="px-8 pt-4 bg-slate-900 hidden">
+      <!-- Distance table will appear here -->
     </div>
 
     <!-- Explanation Area -->

@@ -14,8 +14,13 @@ export const ActionTypes = {
   CLEAR_POINTERS: 'CLEAR_POINTERS', // Xoá con trỏ
   
   // Graph Actions
-  VISIT_NODE: 'VISIT_NODE',
-  UPDATE_EDGE: 'UPDATE_EDGE',
-  ENQUEUE: 'ENQUEUE',
-  DEQUEUE: 'DEQUEUE',
+  VISIT_NODE: 'VISIT_NODE',         // Duyệt 1 đỉnh
+  UPDATE_EDGE: 'UPDATE_EDGE',       // Đi qua/Cập nhật trạng thái 1 cạnh
+  ENQUEUE: 'ENQUEUE',               // Thêm vào Queue (BFS)
+  DEQUEUE: 'DEQUEUE',               // Lấy khỏi Queue (BFS)
+  PUSH_STACK: 'PUSH_STACK',         // Thêm vào Stack (DFS)
+  POP_STACK: 'POP_STACK',           // Lấy khỏi Stack (DFS)
+  
+  // Table / Metadata Actions
+  UPDATE_TABLE: 'UPDATE_TABLE',     // Cập nhật giá trị vào bảng (Dijkstra/DP)
 };

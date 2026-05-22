@@ -1,0 +1,19 @@
+{
+  "id": "bubble_sort",
+  "name": "Sắp xếp nổi bọt (Bubble Sort)",
+  "categoryId": "sorting",
+  "visualizerType": "ARRAY_1D",
+  "difficulty": "Easy",
+  "tags": ["sorting", "in-place", "stable"],
+  "description": "Thuật toán sắp xếp cơ bản nhất, liên tục hoán đổi các phần tử kề nhau nếu chúng sai thứ tự.",
+  "complexity": {
+    "time": {
+      "best": "O(N)",
+      "average": "O(N^2)",
+      "worst": "O(N^2)"
+    },
+    "space": {
+      "worst": "O(1)"
+    }
+  }
+}

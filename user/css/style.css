@@ -1,84 +1,85 @@
-/* ==========================================================================
-   Kento Lab - Custom Stylesheet
-   ========================================================================== */
+    body {
+      font-family: 'Inter', sans-serif;
+    }
 
-body {
-  font-family: 'Inter', sans-serif;
-}
+    .code-font {
+      font-family: 'Fira Code', monospace;
+    }
 
-.code-font {
-  font-family: 'Fira Code', monospace;
-}
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
 
-::-webkit-scrollbar-track {
-  background: #0f172a;
-}
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
 
-::-webkit-scrollbar-thumb {
-  background: #334155;
-  border-radius: 4px;
-}
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #475569;
-}
+    /* SVG Node Animation Transitions */
+    .tree-node-circle {
+      transition: fill 0.3s ease, stroke 0.3s ease, stroke-width 0.2s ease;
+    }
 
-/* SVG Node Animation Transitions */
-.tree-node-circle {
-  transition: fill 0.3s ease, stroke 0.3s ease, stroke-width 0.2s ease;
-}
+    .tree-edge {
+      transition: stroke 0.3s ease, stroke-width 0.2s ease;
+    }
 
-.tree-edge {
-  transition: stroke 0.3s ease, stroke-width 0.2s ease;
-}
+    /* Sidebar Collapsing Transitions */
+    .sidebar-transition {
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
 
-/* Sidebar Collapsing Transitions */
-.sidebar-transition {
-  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
+    /* Collapsed state adjustments for Desktop */
+    @media (min-width: 768px) {
+      .sidebar-collapsed {
+        width: 80px !important;
+      }
 
-/* Collapsed state adjustments for Desktop */
-@media (min-width: 768px) {
-  .sidebar-collapsed {
-    width: 80px !important;
-  }
+      .sidebar-collapsed .logo-text,
+      .sidebar-collapsed .btn-text,
+      .sidebar-collapsed .sidebar-footer-text,
+      .sidebar-collapsed .search-container,
+      .sidebar-collapsed .user-full-card {
+        display: none !important;
+      }
 
-  .sidebar-collapsed .logo-text,
-  .sidebar-collapsed .btn-text,
-  .sidebar-collapsed .sidebar-footer-text,
-  .sidebar-collapsed .search-container {
-    display: none !important;
-  }
+      .sidebar-collapsed .user-collapsed-avatar {
+        display: block !important;
+      }
 
-  .sidebar-collapsed .nav-btn {
-    justify-content: center;
-    padding-left: 0;
-    padding-right: 0;
-  }
+      .sidebar-collapsed .nav-btn {
+        justify-content: center;
+        padding-left: 0;
+        padding-right: 0;
+      }
 
-  .sidebar-collapsed .logo-container {
-    justify-content: center;
-    padding-left: 0;
-    padding-right: 0;
-  }
+      .sidebar-collapsed .logo-container {
+        justify-content: center;
+        padding-left: 0;
+        padding-right: 0;
+      }
 
-  .sidebar-collapsed .logo-icon-wrapper {
-    margin-right: 0 !important;
-  }
+      .sidebar-collapsed .logo-icon-wrapper {
+        margin-right: 0 !important;
+      }
 
-  .sidebar-collapsed .category-header {
-    text-align: center;
-    font-size: 8px;
-    padding: 0.5rem 0.25rem;
-  }
+      .sidebar-collapsed .category-header {
+        text-align: center;
+        font-size: 8px;
+        padding: 0.5rem 0.25rem;
+      }
 
-  .sidebar-collapsed .category-header span {
-    display: none;
-  }
-}
+      .sidebar-collapsed .category-header span {
+        display: none;
+      }
+    }

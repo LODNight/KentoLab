@@ -70,11 +70,5 @@ function confirmSimulatedPayment() {
     }
 
     // Làm mới lại giao diện hiển thị
-    if (currentView === "dashboard") {
-        renderMegaGroupDashboard(activeMegaGroupId);
-    } else if (currentView === "workspace") {
-        selectAlgorithm(activeAlgoId, activeCategoryId);
-    } else if (currentView === "profile") {
-        openProfilePage();
-    }
+    setTimeout(() => window.location.reload(), 1500);
 }

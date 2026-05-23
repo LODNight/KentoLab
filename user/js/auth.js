@@ -84,12 +84,7 @@ function submitLogin(e) {
         syncAuthUI();
         closeAuthModal();
         showToast(`Chào mừng bạn quay lại, ${currentUser.name}!`, "success");
-        // Reload dashboard to update locks representation
-        if (currentView === "dashboard") {
-            renderMegaGroupDashboard(activeMegaGroupId);
-        } else if (currentView === "workspace") {
-            selectAlgorithm(activeAlgoId, activeCategoryId);
-        }
+        setTimeout(() => window.location.reload(), 1000);
     } else {
         showToast("Sai địa chỉ email hoặc mật khẩu bảo mật!", "error");
     }
@@ -121,10 +116,7 @@ function submitRegister(e) {
     syncAuthUI();
     closeAuthModal();
     showToast("Đăng ký tài khoản thành công! Khởi tạo gói miễn phí.", "success");
-
-    if (currentView === "dashboard") {
-        renderMegaGroupDashboard(activeMegaGroupId);
-    }
+    setTimeout(() => window.location.reload(), 1000);
 }
 
 function handleLogout() {
@@ -132,11 +124,7 @@ function handleLogout() {
     localStorage.removeItem('current_user');
     syncAuthUI();
     showToast("Đã đăng xuất tài khoản an toàn.");
-    if (currentView === "profile") {
-        selectMegaGroup("core");
-    } else if (currentView === "dashboard") {
-        renderMegaGroupDashboard(activeMegaGroupId);
-    } else if (currentView === "workspace") {
-        selectAlgorithm(activeAlgoId, activeCategoryId);
-    }
+    setTimeout(() => {
+        window.location.href = "index.html";
+    }, 1000);
 }

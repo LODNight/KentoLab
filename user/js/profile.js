@@ -1,55 +1,70 @@
 // ----------------------------------------------------
 // PROFILE MANAGEMENT PANEL
 // ----------------------------------------------------
+
+// Populate profile data into the profile.html page DOM elements
+function renderProfileData() {
+    if (!currentUser) return;
+
+    const avatarEl = document.getElementById("profile-avatar-large");
+    if (avatarEl) avatarEl.innerText = currentUser.name.charAt(0).toUpperCase();
+
+    const nameEl = document.getElementById("profile-lbl-name");
+    if (nameEl) nameEl.innerText = currentUser.name;
+
+    const emailEl = document.getElementById("profile-lbl-email");
+    if (emailEl) emailEl.innerText = currentUser.email;
+
+    const planBadge = document.getElementById("profile-lbl-plan");
+    if (planBadge) {
+        planBadge.innerText = currentUser.plan === 'Free' ? 'Miễn Phí' : currentUser.plan;
+        if (currentUser.plan === 'Free') {
+            planBadge.className = "px-2.5 py-0.5 rounded text-[10px] font-bold bg-slate-850 text-slate-400 border border-slate-700";
+            document.getElementById("profile-upgrade-btn")?.classList.remove("hidden");
+        } else if (currentUser.plan === 'Pro') {
+            planBadge.className = "px-2.5 py-0.5 rounded text-[10px] font-bold bg-indigo-900/40 text-indigo-300 border border-indigo-500/30";
+            document.getElementById("profile-upgrade-btn")?.classList.add("hidden");
+        } else {
+            planBadge.className = "px-2.5 py-0.5 rounded text-[10px] font-bold bg-purple-900/40 text-purple-300 border border-purple-500/30";
+            document.getElementById("profile-upgrade-btn")?.classList.add("hidden");
+        }
+    }
+
+    const nameInput = document.getElementById("profile-input-name");
+    if (nameInput) nameInput.value = currentUser.name;
+    const emailInput = document.getElementById("profile-input-email");
+    if (emailInput) emailInput.value = currentUser.email;
+    const oldPassInput = document.getElementById("profile-input-old-pass");
+    if (oldPassInput) oldPassInput.value = "";
+    const newPassInput = document.getElementById("profile-input-new-pass");
+    if (newPassInput) newPassInput.value = "";
+}
+
 function openProfilePage() {
     if (!currentUser) {
         showToast("Vui lòng đăng nhập để truy cập trang cá nhân!", "error");
         openAuthModal('login');
         return;
     }
+
+    // If NOT on profile.html, navigate there
+    if (!window.location.pathname.endsWith('profile.html')) {
+        window.location.href = 'profile.html';
+        return;
+    }
+
+    // Already on profile.html - just render the data
     if (typeof pausePlayback === 'function') pausePlayback();
     currentView = "profile";
 
-    // Hide dashboards & workspace, show Profile View
-    document.getElementById("dashboard-container").classList.add("hidden");
-    document.getElementById("workspace-container").classList.add("hidden");
-    document.getElementById("profile-container").classList.remove("hidden");
+    // Show profile container (it's visible by default in profile.html)
+    const profileContainer = document.getElementById("profile-container");
+    if (profileContainer) profileContainer.classList.remove("hidden");
 
-    document.getElementById("mode-switcher-container").classList.add("hidden");
-    document.getElementById("btn-back-to-dashboard").classList.remove("hidden");
-    document.getElementById("breadcrumb-separator").classList.remove("hidden");
 
-    // Breadcrumbs Update
-    document.getElementById("algo-category-badge").innerText = "TÀI KHOẢN THÀNH VIÊN";
-    document.getElementById("workspace-title").innerHTML = `<i class="fa-solid fa-user-gear text-indigo-500"></i> Quản Trị Tài Khoản`;
-    document.getElementById("workspace-subtitle").innerText = "Tùy biến hồ sơ định danh, theo dõi nâng cấp dịch vụ.";
-
-    // Load values into Profile Page
-    document.getElementById("profile-avatar-large").innerText = currentUser.name.charAt(0).toUpperCase();
-    document.getElementById("profile-lbl-name").innerText = currentUser.name;
-    document.getElementById("profile-lbl-email").innerText = currentUser.email;
-
-    const planBadge = document.getElementById("profile-lbl-plan");
-    planBadge.innerText = currentUser.plan === 'Free' ? 'Miễn Phí' : currentUser.plan;
-    if (currentUser.plan === 'Free') {
-        planBadge.className = "px-2.5 py-0.5 rounded text-[10px] font-bold bg-slate-850 text-slate-400 border border-slate-700";
-        document.getElementById("profile-upgrade-btn").classList.remove("hidden");
-    } else if (currentUser.plan === 'Pro') {
-        planBadge.className = "px-2.5 py-0.5 rounded text-[10px] font-bold bg-indigo-900/40 text-indigo-300 border border-indigo-500/30";
-        document.getElementById("profile-upgrade-btn").classList.add("hidden");
-    } else {
-        planBadge.className = "px-2.5 py-0.5 rounded text-[10px] font-bold bg-purple-900/40 text-purple-300 border border-purple-500/30";
-        document.getElementById("profile-upgrade-btn").classList.add("hidden");
-    }
-
-    // Input Prefills
-    document.getElementById("profile-input-name").value = currentUser.name;
-    document.getElementById("profile-input-email").value = currentUser.email;
-
-    // Reset sensitive password forms
-    document.getElementById("profile-input-old-pass").value = "";
-    document.getElementById("profile-input-new-pass").value = "";
+    renderProfileData();
 }
+
 
 function handleUpdateProfile(e) {
     e.preventDefault();

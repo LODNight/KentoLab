@@ -2,6 +2,14 @@
 <html lang="vi" class="h-full bg-slate-950 text-slate-100">
 
 <head>
+  <script>
+    window.onerror = function(msg, url, lineNo, columnNo, error) {
+      console.log('JS ERROR:', msg, 'AT', url, lineNo, columnNo);
+      fetch('/log_error?msg=' + encodeURIComponent(msg) + '&line=' + lineNo);
+      return false;
+    };
+  </script>
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Đại Từ Điển & Phòng Thí Nghiệm Thuật Toán Tương Tác</title>
@@ -35,8 +43,6 @@
 
     </main>
   </div>
-  <script src="js/auth.js?v=1.0.1"></script>
-  <script src="js/payment.js?v=1.0.1"></script>
   <script src="js/profile.js?v=1.0.1"></script>
   <script src="js/components.js?v=1.0.1"></script>
   <script src="js/app.js?v=1.0.1"></script>

@@ -31,6 +31,21 @@
       if (el) el.className = className;
     }
 
+    // LOCAL STORAGE / MOCK DATABASE FOR MEMBERSHIP & USER PROFILE
+    // ----------------------------------------------------
+    let usersDb = JSON.parse(localStorage.getItem('users_db')) || [
+      { email: 'demo@example.com', password: '123456', name: 'Master Algo', plan: 'Free' },
+      { email: 'admin', password: '123', name: 'Admin Master', plan: 'Enterprise' }
+    ];
+
+    // Đảm bảo tài khoản admin luôn tồn tại trong DB kiểm thử
+    if (!usersDb.some(u => u.email === 'admin')) {
+      usersDb.push({ email: 'admin', password: '123', name: 'Admin Master', plan: 'Enterprise' });
+      localStorage.setItem('users_db', JSON.stringify(usersDb));
+    }
+
+    let currentUser = JSON.parse(localStorage.getItem('current_user')) || null;
+
     // List of officially supported interactive simulation algorithms
     const playgroundAlgos = ["linear", "binary", "bubble", "selection", "bfs", "dfs", "dijkstra_graph", "sieve_primes"];
 
@@ -548,24 +563,7 @@
     let playSpeed = 600; // ms
     let currentVisualizerType = 'array';
 
-    // Sidebar DOM refs resolved lazily after loadSharedComponents()
-
-    let isCollapsed = false;
-
-    sidebarToggleDesktop.addEventListener("click", () => {
-      isCollapsed = !isCollapsed;
-      if (isCollapsed) {
-        mainSidebar.classList.add("sidebar-collapsed");
-        sidebarToggleIcon.className = "fa-solid fa-angles-right text-xs";
-      } else {
-        mainSidebar.classList.remove("sidebar-collapsed");
-        sidebarToggleIcon.className = "fa-solid fa-angles-left text-xs";
-      }
-    });
-
-    sidebarToggleMobile.addEventListener("click", () => {
-      sidebarNavContainer.classList.toggle("hidden");
-    });
+    // Sidebar DOM refs resolved lazily after loadSharedComponents()\n\n    let isCollapsed = false; // State preserved for safety
 
     function playAudioTone(val, maxVal = 100) {
       if (!isSoundOn) return;
@@ -2086,12 +2084,6 @@
       else startPlayback();
     }
 
-    document.getElementById("btn-playback-play").addEventListener("click", togglePlayback);
-    document.getElementById("btn-playback-next").addEventListener("click", () => { pausePlayback(); nextStep(); });
-    document.getElementById("btn-playback-prev").addEventListener("click", () => { pausePlayback(); prevStep(); });
-    document.getElementById("btn-playback-first").addEventListener("click", () => { pausePlayback(); currentStepIdx = 0; updateSandboxUI(); });
-    document.getElementById("btn-playback-last").addEventListener("click", () => { pausePlayback(); currentStepIdx = steps.length - 1; updateSandboxUI(); });
-    document.getElementById("slider-step-timeline").addEventListener("input", (e) => { pausePlayback(); currentStepIdx = parseInt(e.target.value); updateSandboxUI(); });
 
     function changePlaySpeed(val) {
       playSpeed = parseInt(val);
@@ -2161,60 +2153,13 @@
       showToast("Đã khởi tạo mảng ngẫu nhiên mới thành công!");
     }
 
-    const modal = document.getElementById("custom-input-modal");
-    function openCustomInputModal() { modal.classList.remove("hidden"); }
-    document.getElementById("btn-modal-cancel").addEventListener("click", () => modal.classList.add("hidden"));
+    // MPA: modal refs and events are lazy
+    function openCustomInputModal() { 
+      const m = document.getElementById("custom-input-modal");
+      if (m) m.classList.remove("hidden");
+    }
 
-    document.getElementById("btn-modal-submit").addEventListener("click", () => {
-      const input = document.getElementById("custom-array-input").value;
-      if (!input.trim()) return;
-      const parsed = input.split(",").map(x => parseInt(x.trim())).filter(x => !isNaN(x));
-      if (parsed.length < 5 || parsed.length > 16) {
-        showToast("Chiều dài mảng phải nằm trong khoảng từ 5 đến 16 phần tử!", "error");
-        return;
-      }
-      modal.classList.add("hidden");
-      if (activeAlgoId === "binary") {
-        parsed.sort((a, b) => a - b);
-      }
-      const profile = algorithmDatabase[activeAlgoId] || algorithmDatabase["linear"];
-      steps = profile.generator(parsed, 32);
-      currentStepIdx = 0;
-      updateSandboxUI();
-      showToast("Đã áp dụng dữ liệu mảng tùy chọn thành công!", "success");
-    });
-
-    // Graph interactions controls
-    document.getElementById("btn-graph-add-node").addEventListener("click", () => {
-      isAddingNodeMode = !isAddingNodeMode;
-      isConnectingMode = false;
-      document.getElementById("btn-graph-connect").classList.remove("bg-indigo-600");
-      if (isAddingNodeMode) {
-        document.getElementById("btn-graph-add-node").classList.add("bg-indigo-600");
-        showToast("Hãy click vào vùng trống canvas để thả nút mới.", "info");
-      } else {
-        document.getElementById("btn-graph-add-node").classList.remove("bg-indigo-600");
-      }
-    });
-
-    document.getElementById("btn-graph-connect").addEventListener("click", () => {
-      isConnectingMode = !isConnectingMode;
-      isAddingNodeMode = false;
-      document.getElementById("btn-graph-add-node").classList.remove("bg-indigo-600");
-      if (isConnectingMode) {
-        document.getElementById("btn-graph-connect").classList.add("bg-indigo-600");
-        showToast("Hãy bấm lần lượt vào 2 đỉnh trên sơ đồ để nối cạnh.", "info");
-      } else {
-        document.getElementById("btn-graph-connect").classList.remove("bg-indigo-600");
-      }
-    });
-
-    document.getElementById("btn-graph-clear").addEventListener("click", () => {
-      graphData.nodes = [];
-      graphData.edges = [];
-      drawInteractiveGraph();
-      showToast("Đã xóa trắng toàn bộ sơ đồ.");
-    });
+    // Graph interactions controls are lazy
 
     algoSearchInput.addEventListener("input", function (e) {
       const query = e.target.value.toLowerCase().trim();

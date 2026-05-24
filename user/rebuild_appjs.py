@@ -19,7 +19,7 @@ onload_idx = main_script.rfind(onload_marker)
 core_script = main_script[:onload_idx].rstrip() if onload_idx != -1 else main_script.rstrip()
 
 # Extract only the pure app section (skip auth/payment/profile/components at start)
-app_start_marker = '    // List of officially supported interactive simulation algorithms'
+app_start_marker = '    // LOCAL STORAGE / MOCK DATABASE FOR MEMBERSHIP'
 app_start = core_script.find(app_start_marker)
 pure_app = core_script[app_start:]
 
@@ -413,22 +413,115 @@ if SVG_TOPLINE in pure_app:
 else:
     print("svgGraph top-level const not found (may already be fixed)")
 
-# ─── PATCH 8: Remove sidebar top-level DOM refs ───────────────────────────────
+# ─── PATCH 8: Remove sidebar top-level DOM refs and event listeners ────────
 OLD_SIDEBAR_BLOCK = '''    const mainSidebar = document.getElementById("main-sidebar");
     const sidebarToggleDesktop = document.getElementById("sidebar-toggle-desktop");
     const sidebarToggleIcon = document.getElementById("sidebar-toggle-icon");
     const sidebarToggleMobile = document.getElementById("sidebar-toggle-mobile");
     const sidebarNavContainer = document.getElementById("sidebar-nav-container");
-    const algoSearchInput = document.getElementById("algo-search-input");'''
+    const algoSearchInput = document.getElementById("algo-search-input");
+
+    let isCollapsed = false;
+
+    sidebarToggleDesktop.addEventListener("click", () => {
+      isCollapsed = !isCollapsed;
+      if (isCollapsed) {
+        mainSidebar.classList.add("sidebar-collapsed");
+        sidebarToggleIcon.className = "fa-solid fa-angles-right text-xs";
+      } else {
+        mainSidebar.classList.remove("sidebar-collapsed");
+        sidebarToggleIcon.className = "fa-solid fa-angles-left text-xs";
+      }
+    });
+
+    sidebarToggleMobile.addEventListener("click", () => {
+      sidebarNavContainer.classList.toggle("hidden");
+    });'''
 
 if OLD_SIDEBAR_BLOCK in pure_app:
     pure_app = pure_app.replace(OLD_SIDEBAR_BLOCK,
-        '    // Sidebar DOM refs resolved lazily after loadSharedComponents()')
-    print("Removed top-level sidebar DOM refs")
+        '    // Sidebar DOM refs resolved lazily after loadSharedComponents()\\n\\n    let isCollapsed = false; // State preserved for safety')
+    print("Removed top-level sidebar DOM refs and event listeners")
 else:
     print("WARNING: Old sidebar block not found (may already be fixed or different)")
 
-print(f"\nFinal pure_app length: {len(pure_app)} chars")
+# ─── PATCH 9: Remove global event listeners that crash on Dashboard ───────────
+pure_app = pure_app.replace('    document.getElementById("btn-playback-play").addEventListener("click", togglePlayback);\n', '')
+pure_app = pure_app.replace('    document.getElementById("btn-playback-next").addEventListener("click", () => { pausePlayback(); nextStep(); });\n', '')
+pure_app = pure_app.replace('    document.getElementById("btn-playback-prev").addEventListener("click", () => { pausePlayback(); prevStep(); });\n', '')
+pure_app = pure_app.replace('    document.getElementById("btn-playback-first").addEventListener("click", () => { pausePlayback(); currentStepIdx = 0; updateSandboxUI(); });\n', '')
+pure_app = pure_app.replace('    document.getElementById("btn-playback-last").addEventListener("click", () => { pausePlayback(); currentStepIdx = steps.length - 1; updateSandboxUI(); });\n', '')
+pure_app = pure_app.replace('    document.getElementById("slider-step-timeline").addEventListener("input", (e) => { pausePlayback(); currentStepIdx = parseInt(e.target.value); updateSandboxUI(); });\n', '')
+
+# Modal ones
+modal_str = '''    const modal = document.getElementById("custom-input-modal");
+    function openCustomInputModal() { modal.classList.remove("hidden"); }
+    document.getElementById("btn-modal-cancel").addEventListener("click", () => modal.classList.add("hidden"));
+
+    document.getElementById("btn-modal-submit").addEventListener("click", () => {
+      const input = document.getElementById("custom-array-input").value;
+      if (!input.trim()) return;
+      const parsed = input.split(",").map(x => parseInt(x.trim())).filter(x => !isNaN(x));
+      if (parsed.length < 5 || parsed.length > 16) {
+        showToast("Chiều dài mảng phải nằm trong khoảng từ 5 đến 16 phần tử!", "error");
+        return;
+      }
+      modal.classList.add("hidden");
+      if (activeAlgoId === "binary") {
+        parsed.sort((a, b) => a - b);
+      }
+      const profile = algorithmDatabase[activeAlgoId] || algorithmDatabase["linear"];
+      steps = profile.generator(parsed, 32);
+      currentStepIdx = 0;
+      updateSandboxUI();
+      showToast("Đã áp dụng dữ liệu mảng tùy chọn thành công!", "success");
+    });'''
+
+modal_repl = '''    // MPA: modal refs and events are lazy
+    function openCustomInputModal() { 
+      const m = document.getElementById("custom-input-modal");
+      if (m) m.classList.remove("hidden");
+    }'''
+pure_app = pure_app.replace(modal_str, modal_repl)
+
+# Graph ones
+graph_str = '''    // Graph interactions controls
+    document.getElementById("btn-graph-add-node").addEventListener("click", () => {
+      isAddingNodeMode = !isAddingNodeMode;
+      isConnectingMode = false;
+      document.getElementById("btn-graph-connect").classList.remove("bg-indigo-600");
+      if (isAddingNodeMode) {
+        document.getElementById("btn-graph-add-node").classList.add("bg-indigo-600");
+        showToast("Hãy click vào vùng trống canvas để thả nút mới.", "info");
+      } else {
+        document.getElementById("btn-graph-add-node").classList.remove("bg-indigo-600");
+      }
+    });
+
+    document.getElementById("btn-graph-connect").addEventListener("click", () => {
+      isConnectingMode = !isConnectingMode;
+      isAddingNodeMode = false;
+      document.getElementById("btn-graph-add-node").classList.remove("bg-indigo-600");
+      if (isConnectingMode) {
+        document.getElementById("btn-graph-connect").classList.add("bg-indigo-600");
+        showToast("Hãy bấm lần lượt vào 2 đỉnh trên sơ đồ để nối cạnh.", "info");
+      } else {
+        document.getElementById("btn-graph-connect").classList.remove("bg-indigo-600");
+      }
+    });
+
+    document.getElementById("btn-graph-clear").addEventListener("click", () => {
+      graphData.nodes = [];
+      graphData.edges = [];
+      drawInteractiveGraph();
+      showToast("Đã xóa trắng toàn bộ sơ đồ.");
+    });'''
+
+graph_repl = '    // Graph interactions controls are lazy'
+pure_app = pure_app.replace(graph_str, graph_repl)
+print("Removed global workspace event listeners")
+
+print(f"\\nFinal pure_app length: {len(pure_app)} chars")
 
 # ─── BUILD FINAL app.js ───────────────────────────────────────────────────────
 MPA_ROUTING = '''
@@ -654,9 +747,7 @@ print(f"\nWrote app.js: {len(final_app_js)} chars")
 
 # ─── Update HTML pages ────────────────────────────────────────────────────────
 # index.html: call initDashboard() (which itself calls loadSharedComponents etc)
-INDEX_INLINE = '''  <script src="js/auth.js?v=1.0.1"></script>
-  <script src="js/payment.js?v=1.0.1"></script>
-  <script src="js/profile.js?v=1.0.1"></script>
+INDEX_INLINE = '''  <script src="js/profile.js?v=1.0.1"></script>
   <script src="js/components.js?v=1.0.1"></script>
   <script src="js/app.js?v=1.0.1"></script>
   <script>
@@ -687,9 +778,7 @@ old_scripts_start = algo_html.find('<script src="js/')
 if old_scripts_start != -1:
     while old_scripts_start > 0 and algo_html[old_scripts_start-1] in ' \n\r\t':
         old_scripts_start -= 1
-    ALGO_INLINE = '''  <script src="js/auth.js?v=1.0.1"></script>
-  <script src="js/payment.js?v=1.0.1"></script>
-  <script src="js/profile.js?v=1.0.1"></script>
+    ALGO_INLINE = '''  <script src="js/profile.js?v=1.0.1"></script>
   <script src="js/components.js?v=1.0.1"></script>
   <script src="js/app.js?v=1.0.1"></script>
   <script>
@@ -710,9 +799,7 @@ old_scripts_start = profile_html.find('<script src="js/')
 if old_scripts_start != -1:
     while old_scripts_start > 0 and profile_html[old_scripts_start-1] in ' \n\r\t':
         old_scripts_start -= 1
-    PROFILE_INLINE = '''  <script src="js/auth.js?v=1.0.1"></script>
-  <script src="js/payment.js?v=1.0.1"></script>
-  <script src="js/profile.js?v=1.0.1"></script>
+    PROFILE_INLINE = '''  <script src="js/profile.js?v=1.0.1"></script>
   <script src="js/components.js?v=1.0.1"></script>
   <script src="js/app.js?v=1.0.1"></script>
   <script>
@@ -725,4 +812,19 @@ if old_scripts_start != -1:
         f.write(new_profile_html)
     print("Updated profile.html")
 
-print("\nAll done! app.js rebuilt and HTML pages updated.")
+print("\nAll done! app.js rebuilt and HTML pages updated.")# ─── PATCH 10: Fix algoSearchInput reference ────────
+SEARCH_OLD = '    algoSearchInput.addEventListener("input", function (e) {'
+SEARCH_NEW = """    function initSidebarEvents() {
+      const algoSearchInput = document.getElementById("algo-search-input");
+      if (!algoSearchInput) return;
+      algoSearchInput.addEventListener("input", function (e) {"""
+
+if SEARCH_OLD in pure_app:
+    pure_app = pure_app.replace(SEARCH_OLD, SEARCH_NEW)
+    pure_app = pure_app.replace('      document.getElementById("algo-category-badge").innerText = "TÌM KIẾM";\n    });', '      document.getElementById("algo-category-badge").innerText = "TÌM KIẾM";\n    });\n    }')
+    pure_app = pure_app.replace('function initDashboard() {', 'function initDashboard() {\n      initSidebarEvents();')
+    pure_app = pure_app.replace('function initAlgorithm() {', 'function initAlgorithm() {\n      initSidebarEvents();')
+    pure_app = pure_app.replace('function initProfile() {', 'function initProfile() {\n      initSidebarEvents();')
+    print("Patched algoSearchInput")
+
+

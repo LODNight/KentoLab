@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="vi" class="h-full bg-slate-950 text-slate-100">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đại Từ Điển & Phòng Thí Nghiệm Thuật Toán Tương Tác</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts Inter & Fira Code -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+</head>
+
+<body class="flex flex-col md:flex-row min-h-screen overflow-x-hidden bg-slate-950 text-slate-100">
+
+
+  <!-- DYNAMIC SHARED COMPONENTS INJECTED HERE -->
+  <div id="sidebar-container"></div>
+  <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2 pointer-events-none"></div>
+  <div id="auth-modal-container"></div>
+  <div id="payment-modal-container"></div>
+
+  <!-- MAIN WORKSPACE -->
+  <main class="flex-grow p-4 md:p-6 overflow-y-auto w-full transition-all duration-300 flex flex-col">
+    <div id="profile-container" class="flex-grow space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 md:p-6 shadow-xl">
+        <h3 class="text-md font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-user-circle text-indigo-500"></i> Quản Lý Hồ Sơ Cá Nhân
+        </h3>
+        <p class="text-xs text-slate-400 mt-0.5">Quản lý cấp độ gói thành viên, tùy biến thông tin định danh và đổi mật
+          khẩu tài khoản.</p>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-6">
+          <!-- User Summary Card Left -->
+          <div
+            class="lg:col-span-4 bg-slate-950 border border-slate-850 rounded-xl p-5 flex flex-col items-center justify-between text-center space-y-4">
+            <div class="space-y-3 w-full">
+              <div
+                class="w-20 h-20 rounded-full bg-indigo-600/10 border-2 border-indigo-500 flex items-center justify-center text-indigo-400 mx-auto">
+                <span id="profile-avatar-large" class="text-3xl font-bold uppercase">U</span>
+              </div>
+              <div>
+                <h4 id="profile-lbl-name" class="text-sm font-bold text-white">Lập trình viên master</h4>
+                <p id="profile-lbl-email" class="text-xs text-slate-500">user@example.com</p>
+              </div>
+            </div>
+
+            <div class="bg-slate-900/60 border border-slate-800 rounded-lg p-3.5 w-full text-left space-y-2.5">
+              <div class="flex justify-between items-center text-xs">
+                <span class="text-slate-400">Gói hoạt động:</span>
+                <span id="profile-lbl-plan"
+                  class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-850 text-slate-400 border border-slate-700">Miễn
+                  Phí</span>
+              </div>
+              <div class="flex justify-between items-center text-xs">
+                <span class="text-slate-400">Thời hạn gói:</span>
+                <span class="text-slate-300 font-semibold">Vô thời hạn</span>
+              </div>
+              <!-- Upgrade button if free -->
+              <button id="profile-upgrade-btn" onclick="openPaymentModal()"
+                class="w-full mt-1.5 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-md text-xs font-bold transition flex items-center justify-center gap-1">
+                <i class="fa-solid fa-crown text-[10px]"></i> Nâng cấp tài khoản VIP
+              </button>
+            </div>
+          </div>
+
+          <!-- Edit Profile Forms Right -->
+          <div class="lg:col-span-8 space-y-6">
+            <!-- 1. Edit Basic Info -->
+            <form onsubmit="handleUpdateProfile(event)"
+              class="bg-slate-900 border border-slate-850 p-4 rounded-xl space-y-4">
+              <h4
+                class="text-xs font-bold text-indigo-400 uppercase tracking-wider border-b border-slate-800 pb-2 flex items-center gap-1.5">
+                <i class="fa-solid fa-pen-to-square"></i> Cập nhật Thông Tin Cá Nhân
+              </h4>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-1">
+                  <label class="block text-[10px] text-slate-400 font-bold uppercase">Họ và tên của bạn</label>
+                  <input type="text" id="profile-input-name" required
+                    class="w-full text-xs bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-lg px-3 py-2 text-slate-100 outline-none transition">
+                </div>
+                <div class="space-y-1 flex flex-col justify-end">
+                  <button type="submit"
+                    class="w-full md:w-auto self-end px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold transition flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-circle-check"></i> Lưu thay đổi
+                  </button>
+                </div>
+              </div>
+            </form>
+
+            <!-- 2. Update Email Form -->
+            <form onsubmit="handleUpdateEmail(event)"
+              class="bg-slate-900 border border-slate-850 p-4 rounded-xl space-y-4">
+              <h4
+                class="text-xs font-bold text-emerald-400 uppercase tracking-wider border-b border-slate-800 pb-2 flex items-center gap-1.5">
+                <i class="fa-solid fa-envelope"></i> Cập nhật Địa Chỉ Email
+              </h4>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-1">
+                  <label class="block text-[10px] text-slate-400 font-bold uppercase">Địa chỉ email mới</label>
+                  <input type="email" id="profile-input-email" required
+                    class="w-full text-xs bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-lg px-3 py-2 text-slate-100 outline-none transition">
+                </div>
+                <div class="space-y-1 flex flex-col justify-end">
+                  <button type="submit"
+                    class="w-full md:w-auto self-end px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold transition flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-sync"></i> Thay đổi Email
+                  </button>
+                </div>
+              </div>
+            </form>
+
+            <!-- 3. Change Password Form -->
+            <form onsubmit="handleUpdatePassword(event)"
+              class="bg-slate-900 border border-slate-850 p-4 rounded-xl space-y-4">
+              <h4
+                class="text-xs font-bold text-amber-400 uppercase tracking-wider border-b border-slate-800 pb-2 flex items-center gap-1.5">
+                <i class="fa-solid fa-key"></i> Đổi Mật Khẩu Đăng Nhập
+              </h4>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-1">
+                  <label class="block text-[10px] text-slate-400 font-bold uppercase">Mật khẩu hiện tại</label>
+                  <input type="password" id="profile-input-old-pass" required
+                    class="w-full text-xs bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-lg px-3 py-2 text-slate-100 outline-none transition">
+                </div>
+                <div class="space-y-1">
+                  <label class="block text-[10px] text-slate-400 font-bold uppercase">Mật khẩu mới</label>
+                  <input type="password" id="profile-input-new-pass" required
+                    class="w-full text-xs bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-lg px-3 py-2 text-slate-100 outline-none transition">
+                </div>
+              </div>
+              <div class="flex justify-end pt-2">
+                <button type="submit"
+                  class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-xs font-bold transition flex items-center justify-center gap-1">
+                  <i class="fa-solid fa-shield-halved"></i> Xác nhận Đổi Mật Khẩu
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  </div>
+  <script src="js/auth.js?v=1.0.1"></script>
+  <script src="js/payment.js?v=1.0.1"></script>
+  <script src="js/profile.js?v=1.0.1"></script>
+  <script src="js/components.js?v=1.0.1"></script>
+  <script src="js/app.js?v=1.0.1"></script>
+  <script>
+    initProfile();
+  </script>
+</body>
+</html>

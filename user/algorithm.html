@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="vi" class="h-full bg-slate-950 text-slate-100">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đại Từ Điển & Phòng Thí Nghiệm Thuật Toán Tương Tác</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts Inter & Fira Code -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+</head>
+
+<body class="flex flex-col md:flex-row min-h-screen overflow-x-hidden bg-slate-950 text-slate-100">
+
+
+    <!-- DYNAMIC SHARED COMPONENTS INJECTED HERE -->
+    <div id="sidebar-container"></div>
+    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2 pointer-events-none"></div>
+    <div id="auth-modal-container"></div>
+    <div id="payment-modal-container"></div>
+
+    <!-- MAIN WORKSPACE -->
+    <main class="flex-grow p-4 md:p-6 overflow-y-auto w-full transition-all duration-300 flex flex-col">
+    <div
+      class="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-900 border border-slate-800 p-4 rounded-xl shadow-lg shrink-0">
+      <div class="space-y-1">
+        <div class="flex items-center gap-2 text-xs">
+          <button id="btn-back-to-dashboard" onclick="goBackToDashboard()"
+            class="hidden text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1 transition">
+            <i class="fa-solid fa-arrow-left"></i> Quay lại Chuyên Đề
+          </button>
+          <span id="breadcrumb-separator" class="hidden text-slate-600">/</span>
+          <span id="algo-category-badge"
+            class="px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">HỆ
+            THỐNG</span>
+        </div>
+        <h2 id="workspace-title" class="text-lg font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-layer-group text-indigo-500"></i> Khởi tạo Đại từ điển...
+        </h2>
+        <p id="workspace-subtitle" class="text-xs text-slate-400 leading-relaxed">Chọn một chuyên đề bên thanh điều
+          hướng trái để khám phá phòng thí nghiệm.</p>
+      </div>
+
+      <!-- Mode Switch Tab Buttons (Only shown when active on an algorithm workspace) -->
+      <div id="mode-switcher-container"
+        class="hidden flex items-center gap-1 bg-slate-950 p-1 rounded-lg border border-slate-800 self-start sm:self-center shrink-0">
+        <button onclick="switchMode('play')" id="mode-play-btn"
+          class="flex items-center gap-1.5 px-3 py-1 text-xs font-semibold transition bg-indigo-600 text-white rounded shadow">
+          <i class="fa-solid fa-flask-vial"></i>
+          <span>Chạy Thử</span>
+        </button>
+        <button onclick="switchMode('learn')" id="mode-learn-btn"
+          class="flex items-center gap-1.5 px-3 py-1 text-xs font-semibold transition text-slate-400 hover:text-slate-200 rounded">
+          <i class="fa-solid fa-book-open"></i>
+          <span>Xem Chi Tiết</span>
+        </button>
+      </div>
+    </div>
+
+    <div id="workspace-container" class="hidden flex-grow flex flex-col">
+
+      <!-- PLAYGROUND SANDBOX AREA -->
+      <div id="sandbox-container" class="grid grid-cols-1 xl:grid-cols-12 gap-5 flex-grow items-start">
+
+        <!-- Left Config Controls Column -->
+        <div class="xl:col-span-4 space-y-4">
+          <!-- Configuration Console -->
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-xl">
+            <h3
+              class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center justify-between">
+              <span><i class="fa-solid fa-sliders text-indigo-500 mr-1.5"></i>Tham số trực quan</span>
+              <span id="sandbox-type-indicator"
+                class="text-[9px] bg-slate-950 border border-slate-800 px-1.5 py-0.5 rounded text-indigo-400 font-semibold uppercase">Array</span>
+            </h3>
+
+            <div id="dynamic-controls" class="space-y-4 text-xs">
+              <!-- Dynamically populated parameters based on active visualizer type -->
+            </div>
+          </div>
+
+          <!-- Complexity Indicator & Summary -->
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-xl space-y-3">
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Độ phức tạp lý thuyết</h3>
+            <div class="grid grid-cols-2 gap-2 text-center">
+              <div class="bg-slate-950 p-2 rounded-lg border border-slate-850">
+                <span class="block text-[8px] text-slate-500">THỜI GIAN</span>
+                <span id="lbl-complexity-time" class="text-xs font-bold text-amber-400 code-font">O(n log n)</span>
+              </div>
+              <div class="bg-slate-950 p-2 rounded-lg border border-slate-850">
+                <span class="block text-[8px] text-slate-500">KHÔNG GIAN</span>
+                <span id="lbl-complexity-space" class="text-xs font-bold text-emerald-400 code-font">O(n)</span>
+              </div>
+            </div>
+            <div class="bg-indigo-950/20 border border-indigo-900/30 rounded-lg p-2.5">
+              <p id="algo-short-summary" class="text-[11px] text-indigo-300 leading-relaxed"></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Visualizer Canvas & Code Monitor -->
+        <div class="xl:col-span-8 grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+          <!-- Interactive Visualizer Panel -->
+          <div class="lg:col-span-7 flex flex-col gap-4">
+            <div
+              class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-xl flex-grow flex flex-col justify-between min-h-[380px]">
+              <div class="flex justify-between items-center mb-2 shrink-0">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Màn Hình Trực Quan Hóa</h3>
+                <!-- Dynamic Status Indicators -->
+                <div id="visualizer-legends" class="flex gap-1 text-[8px]">
+                  <!-- Injected dynamically -->
+                </div>
+              </div>
+
+              <!-- Dynamic Viewport (Swapped dynamically by Javascript) -->
+              <div
+                class="relative bg-slate-950 border border-slate-850 rounded-lg p-3 min-h-[220px] max-h-[240px] flex items-center justify-center overflow-hidden flex-grow">
+
+                <!-- 1. Array Visualizer Workspace -->
+                <div id="canvas-array" class="w-full h-full flex items-end justify-center gap-1 py-2 min-h-[200px]">
+                  <!-- Array columns injected here -->
+                </div>
+
+                <!-- 2. Graph / Tree Visualizer Workspace -->
+                <div id="canvas-graph" class="hidden w-full h-full min-h-[200px]">
+                  <div class="absolute top-2 left-2 flex gap-1 z-10">
+                    <button id="btn-graph-add-node"
+                      class="px-2 py-1 bg-slate-800 border border-slate-700 rounded text-[9px] font-bold text-slate-300 hover:bg-slate-700 transition"
+                      title="Bấm vào khoảng trống canvas sau khi kích hoạt để thêm nút">+ Nút</button>
+                    <button id="btn-graph-connect"
+                      class="px-2 py-1 bg-slate-800 border border-slate-700 rounded text-[9px] font-bold text-slate-300 hover:bg-slate-700 transition"
+                      title="Bấm lần lượt vào 2 nút để tạo liên kết">Nối cạnh</button>
+                    <button id="btn-graph-clear"
+                      class="px-2 py-1 bg-rose-950 border border-rose-800/50 rounded text-[9px] font-bold text-rose-300 hover:bg-rose-900 transition">Xóa
+                      trắng</button>
+                  </div>
+                  <svg id="visualizer-svg-graph" class="w-full h-[200px] cursor-crosshair">
+                    <!-- Dynamic Graph components drawing -->
+                  </svg>
+                </div>
+
+                <!-- 3. Dynamic Programming Table Visualizer -->
+                <div id="canvas-dp-grid"
+                  class="hidden w-full h-full overflow-auto max-h-[200px] flex items-center justify-center">
+                  <!-- DP Grid values injected here -->
+                </div>
+
+                <!-- 4. Interactive Logic Terminal/Register Console -->
+                <div id="canvas-console"
+                  class="hidden w-full h-full text-left code-font text-xs text-slate-300 overflow-y-auto max-h-[200px] bg-slate-950 p-2 border border-slate-900 rounded select-text">
+                  <!-- Console commands / State steps output -->
+                </div>
+              </div>
+
+              <!-- Active Step Action Explanation Card -->
+              <div class="mt-3 bg-slate-950 border border-slate-850 rounded-lg p-2.5 min-h-[64px] flex items-center">
+                <p id="step-description-text" class="text-xs text-slate-300 font-medium leading-relaxed">Đang tải mô tả
+                  hành động...</p>
+              </div>
+            </div>
+
+            <!-- Playback Navigation Controls Console -->
+            <div id="playback-controls-bar"
+              class="bg-slate-900 border border-slate-800 rounded-xl p-3 shadow-xl flex flex-col gap-2 shrink-0">
+              <div class="flex items-center justify-center gap-3">
+                <button id="btn-playback-first"
+                  class="w-8 h-8 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg transition"
+                  title="Lượt đầu"><i class="fa-solid fa-backward-step text-xs"></i></button>
+                <button id="btn-playback-prev"
+                  class="w-8 h-8 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg transition"
+                  title="Bước trước"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+                <button id="btn-playback-play"
+                  class="w-10 h-10 flex items-center justify-center bg-indigo-600 hover:bg-indigo-500 text-white rounded-full shadow-lg transition transform active:scale-95"
+                  title="Chạy tự động / Tạm dừng"><i class="fa-solid fa-play text-sm ml-0.5"
+                    id="playback-play-icon"></i></button>
+                <button id="btn-playback-next"
+                  class="w-8 h-8 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg transition"
+                  title="Bước sau"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+                <button id="btn-playback-last"
+                  class="w-8 h-8 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg transition"
+                  title="Lượt cuối"><i class="fa-solid fa-forward-step text-xs"></i></button>
+              </div>
+
+              <div class="space-y-1">
+                <div class="flex justify-between text-[9px] text-slate-400">
+                  <span>Trình tự: <span id="lbl-step-current-num" class="text-indigo-400 font-bold">0</span>/<span
+                      id="lbl-step-total-num" class="font-bold">0</span></span>
+                  <span id="lbl-step-progress-percent">0%</span>
+                </div>
+                <input type="range" id="slider-step-timeline" min="0" max="0" value="0"
+                  class="w-full accent-indigo-500 cursor-pointer h-1 rounded-lg">
+              </div>
+            </div>
+          </div>
+
+          <!-- Right side: Code Trace Monitor -->
+          <div
+            class="lg:col-span-5 bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-xl flex flex-col justify-between min-h-[380px]">
+            <div class="flex-grow flex flex-col">
+              <h3
+                class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2.5 flex items-center justify-between">
+                <span><i class="fa-solid fa-code text-indigo-500 mr-1.5"></i>Mã nguồn tương đương</span>
+                <span class="text-[9px] bg-slate-950 border border-slate-800 px-1.5 py-0.5 rounded text-slate-400">Mã
+                  giả</span>
+              </h3>
+              <div id="code-trace-viewport"
+                class="bg-slate-950 border border-slate-850 rounded-lg p-2.5 code-font text-[10px] text-slate-300 space-y-1 overflow-x-auto overflow-y-auto max-h-[300px] flex-grow">
+                <!-- Animated code lines injected here -->
+              </div>
+            </div>
+            <div
+              class="border-t border-slate-850 pt-3 mt-3 flex justify-between items-center text-[9px] text-slate-500 shrink-0">
+              <span class="flex items-center gap-1.5"><span
+                  class="w-2 h-2 bg-indigo-500/30 border border-indigo-400 rounded inline-block"></span>Dòng đang thực
+                thi</span>
+              <span>Tự động cập nhật</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- THEORETICAL DEEP-DIVE AREA (10-point standard encyclopedia template) -->
+      <div id="learn-container"
+        class="relative hidden bg-slate-900 border border-slate-800 rounded-xl p-5 md:p-6 shadow-xl space-y-6">
+
+        <!-- BLUR LOCKING OVERLAY (Prompting upgrade to VIP) -->
+        <div id="academy-lock-overlay"
+          class="hidden absolute inset-0 bg-slate-950/85 backdrop-blur-md rounded-xl z-25 flex flex-col items-center justify-center p-6 text-center">
+          <div
+            class="w-16 h-16 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-500 mb-4 animate-bounce">
+            <i class="fa-solid fa-crown text-2xl"></i>
+          </div>
+          <h3 class="text-lg font-black text-white">Tính Năng Học Thuật Độc Quyền Pro</h3>
+          <p class="text-xs text-slate-400 max-w-sm mt-1 mb-5">Vui lòng nâng cấp tài khoản của bạn lên gói học viên Pro
+            để mở khóa 10 tiêu chí học thuật chuyên sâu và mã nguồn chất lượng cao.</p>
+          <div class="flex gap-2">
+            <button onclick="openPaymentModal()"
+              class="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-lg text-xs font-bold hover:opacity-95 transition">Nâng
+              cấp VIP ngay</button>
+            <button onclick="goBackToDashboard()"
+              class="px-4 py-2 bg-slate-800 text-slate-300 hover:bg-slate-700 rounded-lg text-xs font-semibold transition">Về
+              trang chủ</button>
+          </div>
+        </div>
+
+        <div class="border-b border-slate-800 pb-4">
+          <h3 class="text-lg font-extrabold text-white flex items-center gap-2" id="theory-title">
+            <i class="fa-solid fa-book text-indigo-500"></i> Sổ tay học thuật thuật toán
+          </h3>
+          <p class="text-xs text-slate-400 mt-1" id="theory-subtitle">Xem thông số chi tiết của 10 tiêu chuẩn học thuật.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Main documentation Column -->
+          <div class="lg:col-span-2 space-y-6">
+            <!-- Standard 1, 2, 3 Card -->
+            <div class="bg-slate-950 border border-slate-850 rounded-xl p-4 space-y-4">
+              <div>
+                <h4 class="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-1">1. Khái Niệm</h4>
+                <p id="theory-desc-concept" class="text-xs text-slate-300 leading-relaxed"></p>
+              </div>
+
+              <div class="border-t border-slate-900 pt-3">
+                <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wider mb-1">2. Điều Kiện Sử Dụng</h4>
+                <p id="theory-desc-conditions" class="text-xs text-slate-300 leading-relaxed"></p>
+              </div>
+
+              <div class="border-t border-slate-900 pt-3">
+                <h4 class="text-xs font-bold text-purple-400 uppercase tracking-wider mb-1">3. Ý Tưởng Hoạt Động</h4>
+                <p id="theory-desc-idea" class="text-xs text-slate-300 leading-relaxed"></p>
+              </div>
+
+              <div class="border-t border-slate-900 pt-3">
+                <h4 class="text-xs font-bold text-teal-400 uppercase tracking-wider mb-1">4. Hướng Dẫn Vận Hành Trực
+                  Quan (Playground Guide)</h4>
+                <p id="theory-desc-guide" class="text-xs text-slate-300 leading-relaxed"></p>
+              </div>
+            </div>
+
+            <!-- Standard 5 & 6 Code & Pseudocode Card -->
+            <div class="space-y-4">
+              <div class="bg-slate-950 border border-slate-850 rounded-xl p-4">
+                <h4 class="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-2">5. Pseudocode (Mã Giả Chi
+                  Tiết)</h4>
+                <pre id="theory-pseudocode"
+                  class="code-font text-[10px] text-slate-300 bg-slate-900/65 border border-slate-850 p-3 rounded-lg overflow-x-auto whitespace-pre-wrap"></pre>
+              </div>
+
+              <div class="bg-slate-950 border border-slate-850 rounded-xl p-4 relative">
+                <div class="absolute top-4 right-4 flex gap-1">
+                  <button onclick="copyToClipboard('theory-code-cpp')"
+                    class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-[10px] text-slate-300 rounded font-medium transition flex items-center gap-1">
+                    <i class="fa-solid fa-copy"></i> C++
+                  </button>
+                  <button onclick="copyToClipboard('theory-code-py')"
+                    class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-[10px] text-slate-300 rounded font-medium transition flex items-center gap-1">
+                    <i class="fa-solid fa-copy"></i> Python
+                  </button>
+                </div>
+                <h4 class="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-2.5">6. Code mẫu Hoàn Chỉnh
+                </h4>
+
+                <!-- Hidden containers for simple copy -->
+                <textarea id="theory-code-cpp" class="hidden"></textarea>
+                <textarea id="theory-code-py" class="hidden"></textarea>
+
+                <div class="bg-slate-900/65 border border-slate-850 rounded-lg p-3 overflow-hidden">
+                  <pre id="theory-rendered-code"
+                    class="code-font text-[10px] text-slate-300 overflow-x-auto max-h-[350px] whitespace-pre"></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Side: Complexities, Apps & Related Exercises -->
+          <div class="space-y-6">
+            <!-- Standard 7 & 8 Complexities Sheet -->
+            <div class="bg-slate-950 border border-slate-850 rounded-xl p-4 space-y-3">
+              <h4 class="text-xs font-bold text-pink-400 uppercase tracking-wider">Hiệu năng & Phức tạp</h4>
+              <div class="space-y-2 text-xs">
+                <div class="flex justify-between py-1 border-b border-slate-900">
+                  <span class="text-slate-400">7. Thời Gian (Time Complexity):</span>
+                </div>
+                <div class="grid grid-cols-3 gap-1.5 text-[10px]">
+                  <div class="bg-slate-900 p-1.5 rounded text-center">
+                    <span class="block text-[8px] text-slate-500 uppercase">TỐT NHẤT</span>
+                    <span id="theory-time-best" class="font-bold text-emerald-400 code-font"></span>
+                  </div>
+                  <div class="bg-slate-900 p-1.5 rounded text-center">
+                    <span class="block text-[8px] text-slate-500 uppercase">TRUNG BÌNH</span>
+                    <span id="theory-time-avg" class="font-bold text-amber-400 code-font"></span>
+                  </div>
+                  <div class="bg-slate-900 p-1.5 rounded text-center">
+                    <span class="block text-[8px] text-slate-500 uppercase">TỆ NHẤT</span>
+                    <span id="theory-time-worst" class="font-bold text-rose-400 code-font"></span>
+                  </div>
+                </div>
+
+                <div class="flex justify-between py-1 pt-3 border-b border-slate-900">
+                  <span class="text-slate-400">8. Không Gian (Space Complexity):</span>
+                  <span id="theory-space-complexity" class="font-bold text-purple-400 code-font"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Standard 9 Applications -->
+            <div class="bg-slate-950 border border-slate-850 rounded-xl p-4">
+              <h4 class="text-xs font-bold text-cyan-400 uppercase tracking-wider mb-2">9. Ứng dụng Thực tế</h4>
+              <div id="theory-apps-list" class="text-xs text-slate-400 space-y-2 leading-relaxed">
+                <!-- Applications go here -->
+              </div>
+            </div>
+
+            <!-- Standard 10 Related Exercises -->
+            <div class="bg-slate-950 border border-slate-850 rounded-xl p-4">
+              <h4 class="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-2">10. Bài Tập Kinh Điển</h4>
+              <div id="theory-exercises-list" class="space-y-2">
+                <!-- Related Exercises tables -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    </main>
+  </div>
+  <div id="custom-input-modal"
+    class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 p-6 rounded-xl shadow-2xl max-w-sm w-full">
+      <h4 class="text-md font-bold text-slate-100 mb-2">Nhập mảng thủ công</h4>
+      <p class="text-xs text-slate-400 mb-4">Nhập các phần tử số cách nhau bởi dấu phẩy (Ví dụ: 15, 8, 42, 23, 4, 16).
+        Độ dài từ 5 đến 16, giá trị từ 10 đến 99.</p>
+      <input type="text" id="custom-array-input" placeholder="15, 8, 42, 23, 4, 16"
+        class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-indigo-500 mb-4">
+      <div class="flex justify-end gap-2">
+        <button id="btn-modal-cancel"
+          class="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-semibold text-slate-300 transition">Hủy</button>
+        <button id="btn-modal-submit"
+          class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-xs font-semibold text-white transition">Xác
+          nhận</button>
+      </div>
+    </div>
+  </div>
+  <script src="js/auth.js?v=1.0.1"></script>
+  <script src="js/payment.js?v=1.0.1"></script>
+  <script src="js/profile.js?v=1.0.1"></script>
+  <script src="js/components.js?v=1.0.1"></script>
+  <script src="js/app.js?v=1.0.1"></script>
+  <script>
+    initAlgorithm();
+  </script>
+</body>
+</html>
